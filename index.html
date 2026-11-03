@@ -1414,7 +1414,7 @@ if (hasGsap) {
   if (!reduce && window.Lenis) {
     // slow, gliding scroll: a low lerp trails the input, a smaller wheel step covers less ground per notch,
     // and syncTouch gives phones the same eased glide instead of native flick speed
-    lenis = new window.Lenis({ lerp: 0.06, wheelMultiplier: 0.72, smoothWheel: true, syncTouch: true, syncTouchLerp: 0.06, touchMultiplier: 0.9 });
+    lenis = new window.Lenis({ lerp: 0.045, wheelMultiplier: 0.5, smoothWheel: true, syncTouch: true, syncTouchLerp: 0.05, touchMultiplier: 0.75 });
     lenis.on('scroll', ScrollTrigger.update);
     gsap.ticker.add(t => lenis.raf(t * 1000));
     gsap.ticker.lagSmoothing(0);
@@ -1422,7 +1422,8 @@ if (hasGsap) {
   $$('a[href^="#"]').forEach(a => a.addEventListener('click', e => {
     const id = a.getAttribute('href'); const el = id === '#top' ? document.body : $(id);
     if (!el) return; e.preventDefault();
-    if (lenis) lenis.scrollTo(el, { offset: id === '#top' ? 0 : -40, duration: 2.4 }); else el.scrollIntoView({ behavior: reduce ? 'auto' : 'smooth' });
+    // offset 0 so a jump lands exactly on a snap point (every section's own top padding clears the nav)
+    if (lenis) lenis.scrollTo(el, { duration: 2.6 }); else el.scrollIntoView({ behavior: reduce ? 'auto' : 'smooth' });
     try { history.replaceState(null, '', id); } catch {}
   }));
 
@@ -1580,6 +1581,36 @@ if (hasGsap) {
     loader.remove();
     $$('.mern-item').forEach(el => el.classList.add('lit'));
     gsap.set('.tl-fill', { scaleY: 1 });
+  }
+
+  // section-aware soft snap: once the glide settles near the start of a section (or the card deal), ease the
+  // rest of the way so each chapter lands framed; anywhere deeper inside long content is left exactly where it is
+  if (lenis) {
+    let points = [], idle = null, snapping = false;
+    const SNAP_IDS = ['#top', '#about', '#services', '#stack', '#work', '#smarthire', '#chatapp', '#mintlist', '#restaurant', '#journey', '#contact'];
+    const measure = () => {
+      points = SNAP_IDS.map(id => $(id)).filter(Boolean).map(el => Math.round(el.getBoundingClientRect().top + scrollY));
+      const deal = ScrollTrigger.getAll().find(s => s.pin);
+      if (deal) points.push(Math.round(deal.start), Math.round(deal.end));
+      points.sort((a, b) => a - b);
+    };
+    ScrollTrigger.addEventListener('refresh', measure); measure();
+    lenis.on('scroll', () => {
+      clearTimeout(idle);
+      if (snapping) return;
+      idle = setTimeout(() => {
+        const y = lenis.scroll, range = innerHeight * 0.22, max = lenis.limit;
+        if (y <= 2 || y >= max - 2 || lenis.isStopped) return;
+        const near = points.reduce((best, p) => (Math.abs(p - y) < Math.abs(best - y) ? p : best), -1e9);
+        const d = Math.abs(near - y);
+        if (d < 3 || d > range) return;
+        snapping = true;
+        lenis.scrollTo(Math.min(near, max), { duration: 1.4, easing: t => 1 - Math.pow(1 - t, 3), onComplete: () => (snapping = false) });
+        setTimeout(() => (snapping = false), 1700);
+      }, 260);
+    });
+    // fresh input already overrides a running scrollTo in Lenis; just let the next settle be judged again
+    ['wheel', 'touchstart', 'keydown'].forEach(ev => addEventListener(ev, () => (snapping = false), { passive: true }));
   }
   addEventListener('load', () => ScrollTrigger.refresh());
 } else {
