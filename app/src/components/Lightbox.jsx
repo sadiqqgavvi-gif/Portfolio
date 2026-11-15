@@ -5,7 +5,7 @@ import { useKey } from '../lib/hooks.js';
 
 const pad = value => String(value).padStart(2, '0');
 const control =
-  'grid size-12 place-items-center rounded-full border border-line bg-ink/80 text-bone backdrop-blur-md transition-colors duration-300 hover:border-sodium hover:bg-sodium hover:text-ink';
+  'grid size-12 place-items-center rounded-full border border-line bg-ink/90 text-bone transition-colors duration-300 hover:border-sodium hover:bg-sodium hover:text-ink';
 
 // Full-screen viewer for one project's screenshots: arrows, keyboard and swipe move between them.
 export default function Lightbox({ shots, index, accent, onChange, onClose }) {
@@ -34,7 +34,7 @@ export default function Lightbox({ shots, index, accent, onChange, onClose }) {
 
   return (
     <motion.div
-      className="fixed inset-0 z-[140] flex flex-col bg-ink/96 backdrop-blur-xl"
+      className="fixed inset-0 z-[140] flex flex-col bg-ink/97"
       role="dialog"
       aria-modal="true"
       aria-label="Screenshot viewer"

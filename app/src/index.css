@@ -1,7 +1,7 @@
 @import 'tailwindcss';
 
 @theme {
-  --color-ink: #050b10;
+  --color-ink: #04080b;
   --color-ink-2: #0a161d;
   --color-ink-3: #10222b;
   --color-bone: #e8ece6;
@@ -102,21 +102,14 @@
   color: transparent;
   -webkit-text-stroke: 1px rgb(232 236 230 / 0.42);
 }
+/* Dark tinted surfaces. No backdrop-filter anywhere on the page: the WebGL stage behind everything redraws
+   every frame, and a live blur over it would be recomputed every frame too. */
 @utility glass {
-  background: rgb(10 22 29 / 0.62);
-  -webkit-backdrop-filter: blur(16px) saturate(1.3);
-  backdrop-filter: blur(16px) saturate(1.3);
+  background: rgb(6 12 16 / 0.82);
 }
-/* Dark glass surface for cards. The live blur is kept for pointer devices; on touch screens the panel is
-   simply a little more opaque, because blurring a moving WebGL backdrop every frame is costly on phones. */
 @utility panel {
-  background-color: rgb(7 20 27 / 0.84);
-  border-color: rgb(255 255 255 / 0.14);
-  @media (hover: hover) and (min-width: 768px) {
-    background-color: rgb(7 20 27 / 0.66);
-    -webkit-backdrop-filter: blur(18px) saturate(1.25);
-    backdrop-filter: blur(18px) saturate(1.25);
-  }
+  background-color: rgb(6 12 16 / 0.86);
+  border-color: rgb(255 255 255 / 0.1);
 }
 @utility preserve-3d {
   transform-style: preserve-3d;

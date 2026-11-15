@@ -84,7 +84,7 @@ export default function Stack() {
                 {group.items.map(item => (
                   <span
                     key={item}
-                    className={`glass rounded-full border px-3 py-1.5 text-[clamp(0.76rem,0.7rem+0.3vw,0.84rem)] leading-none transition-colors duration-300 hover:border-sodium hover:text-sodium ${group.accent ? 'border-sodium/50 text-bone' : 'border-line text-bone/90'}`}
+                    className={`rounded-full border bg-ink/70 px-3 py-1.5 text-[clamp(0.76rem,0.7rem+0.3vw,0.84rem)] leading-none transition-colors duration-300 hover:border-sodium hover:text-sodium ${group.accent ? 'border-sodium/50 text-bone' : 'border-line text-bone/90'}`}
                   >
                     {item}
                   </span>

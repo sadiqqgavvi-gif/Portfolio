@@ -7,7 +7,7 @@ const base =
 
 const variants = {
   solid: 'border-sodium bg-sodium text-ink',
-  ghost: 'border-line bg-ink/40 text-bone backdrop-blur-sm'
+  ghost: 'border-line bg-ink/70 text-bone'
 };
 
 // A pill button that leans toward the pointer (React Bits Magnet) and fills from the bottom on hover.

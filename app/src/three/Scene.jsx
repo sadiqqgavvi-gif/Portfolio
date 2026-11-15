@@ -5,16 +5,18 @@ import * as THREE from 'three';
 import { sceneState } from '../lib/scene-state.js';
 import { prefersReducedMotion } from '../lib/scroll.js';
 
-/* The stage behind the whole page, drawn in one WebGL canvas:
+/* The stage behind the whole page, drawn in one WebGL canvas on a near-black ground:
 
-   1. Backdrop: a field of slow, glowing light with fine contour lines running through it, like strata.
-      Its colours belong to the section on screen and, in the work section, to the project being shown.
-   2. The stack: "full stack" drawn literally as four glass slabs, one per layer a request passes through.
-      It sits beside the hero, pulls apart while the Stack section is pinned, steps aside for the project
-      cards and returns for the contact section.
-   3. Dust: a sparse particle field in front, which gives the scroll its sense of travel.
+   1. Flow: a ribbon of a few hundred hair-thin threads of light that twists and breathes through space,
+      with light running along the threads. Scrolling speeds the flow up and turns the ribbon to a new
+      angle for every section, so the camera seems to travel around it.
+   2. The stack: "full stack" drawn literally as four dark glass slabs, one per layer a request passes
+      through. It sits beside the hero, pulls apart while the Stack section is pinned, steps aside for the
+      project cards and returns for the contact section.
+   3. Dust: a sparse field of motes for depth.
 
-   Every screen size gets the same choreography; only the positions differ between wide and tall screens. */
+   Everything is cheap per pixel: thin additive lines and a few meshes, no full-screen shader. Every screen
+   size gets the same choreography; only the positions differ between wide and tall screens. */
 
 const LAYERS = [
   { letter: 'R', name: 'REACT', sub: 'interface', color: '#5fe3d4' },
@@ -54,22 +56,32 @@ const POSES = {
   ]
 };
 
-// Backdrop palette per section: three light colours and an overall strength.
-const hex = value => {
-  const n = parseInt(value.slice(1), 16);
-  return [((n >> 16) & 255) / 255, ((n >> 8) & 255) / 255, (n & 255) / 255];
+// Ribbon pose per section: [x, y, z, rotX, rotY, rotZ, brightness]
+const FLOW = {
+  wide: [
+    [0.6, -0.4, -3, 0.35, -0.25, 0.38, 1],
+    [0, 0.3, -4, 0.7, 0.3, -0.22, 0.85],
+    [0, -1.2, -5, 1.0, -0.2, 0.12, 0.7],
+    [1.4, -0.2, -3, 0.25, -0.5, 0.55, 1],
+    [0, 0.6, -5, 0.8, 0.2, -0.3, 0.7],
+    [0, 0.2, -6, 0.3, 0, -0.12, 0.62],
+    [-0.8, 0.4, -4, 0.55, 0.45, -0.42, 0.85],
+    [0.6, -0.5, -3, 0.35, -0.3, 0.4, 1.05]
+  ],
+  // Tall screens: a smaller ribbon that keeps to the space the text leaves free (around the stack).
+  tall: [
+    [0, 1.75, -4, 0.35, -0.2, 0.32, 1],
+    [0, -2.3, -5, 0.7, 0.3, -0.3, 0.75],
+    [0, 0, -6, 1.0, -0.2, 0.4, 0.55],
+    [0, 1.85, -4, 0.3, -0.4, 0.3, 0.9],
+    [0, 0, -6, 0.8, 0.2, -0.4, 0.55],
+    [0, 0, -7, 0.3, 0, -0.5, 0.5],
+    [0, 0.3, -5, 0.55, 0.4, -0.5, 0.7],
+    [0, -2.4, -4, 0.35, -0.3, 0.3, 0.95]
+  ]
 };
-const PALETTES = [
-  { a: hex('#1fd8c2'), b: hex('#ff7a2f'), c: hex('#6d5cff'), power: 1 },
-  { a: hex('#7b68ff'), b: hex('#1fd8c2'), c: hex('#ff5fa2'), power: 0.85 },
-  { a: hex('#ff7a2f'), b: hex('#e64d9c'), c: hex('#6d5cff'), power: 0.8 },
-  { a: hex('#1fd8c2'), b: hex('#45d98a'), c: hex('#3b9bff'), power: 0.95 },
-  { a: hex('#1fd8c2'), b: hex('#3b9bff'), c: hex('#6d5cff'), power: 0.7 },
-  { a: hex('#5f8bff'), b: hex('#6d5cff'), c: hex('#1fd8c2'), power: 0.85 },
-  { a: hex('#4f8dff'), b: hex('#8a6bff'), c: hex('#1fd8c2'), power: 0.85 },
-  { a: hex('#6d5cff'), b: hex('#ff7a2f'), c: hex('#1fd8c2'), power: 0.9 }
-];
-const WORK = SECTIONS.indexOf('work');
+const COOL = new THREE.Color('#a8efe6');
+const WARM = new THREE.Color('#ff9a4d');
 
 const smooth = t => {
   const x = Math.min(1, Math.max(0, t));
@@ -145,168 +157,182 @@ function mixInto(out, table) {
   return out;
 }
 
-/* ---------- Backdrop ---------- */
+/* ---------- Flow ---------- */
 
-const BACKDROP_VERTEX = /* glsl */ `
-  varying vec2 vUv;
+const FLOW_VERTEX = /* glsl */ `
+  attribute float aU;
+  attribute float aSeed;
+  uniform float uPhase;
+  uniform float uGain;
+  uniform float uSpread;
+  uniform float uFocus;
+  uniform float uWarmShare;
+  uniform vec3 uCool;
+  uniform vec3 uWarm;
+  varying vec3 vColor;
+  varying float vAlpha;
+
   void main() {
-    vUv = uv;
-    gl_Position = vec4(position.xy, 1.0, 1.0);
+    float u = aU;
+    float s = aSeed;
+    float t = uPhase;
+    float h = fract(s * 91.7 + 0.13);
+    float x = (u - 0.5) * 26.0;
+
+    // The spine: one long, slow wave through space.
+    vec3 spine = vec3(
+      x,
+      sin(x * 0.16 + t * 0.35) * 1.3 + sin(x * 0.07 - t * 0.21) * 1.6,
+      cos(x * 0.12 + t * 0.27) * 1.8
+    );
+
+    // Threads fan out across the ribbon, which twists along its length and breathes in width.
+    float across = s - 0.5;
+    float width = uSpread * (0.5 + 0.5 * sin(x * 0.18 - t * 0.4 + 1.3));
+    float angle = x * 0.13 + t * 0.12 + across * 1.4;
+    vec3 offset = vec3(0.0, cos(angle), sin(angle)) * across * width;
+
+    // Each thread wanders a little on its own, like loose silk.
+    offset.y += sin(x * 0.9 + h * 40.0 + t * 0.8) * 0.05;
+    offset.z += cos(x * 0.7 + h * 23.0 - t * 0.6) * 0.07;
+
+    vec4 mv = modelViewMatrix * vec4(spine + offset, 1.0);
+    gl_Position = projectionMatrix * mv;
+
+    // Light running along the threads, brightest at the camera's focal depth; the ends fade out.
+    float run = pow(0.5 + 0.5 * sin(u * 22.0 - t * 2.6 + h * 30.0), 22.0);
+    float ends = smoothstep(0.0, 0.2, u) * smoothstep(1.0, 0.8, u);
+    float focus = exp(-pow((-mv.z - uFocus) / 4.5, 2.0));
+    // Where the ribbon turns edge-on, hundreds of threads overlap; a low base keeps those folds from
+    // burning to white, while the sparse running lights stay bright.
+    vAlpha = (0.012 + 0.028 * focus + run * (0.28 + 0.5 * focus)) * ends * uGain;
+    vColor = mix(uCool, uWarm, step(1.0 - uWarmShare, h));
   }
 `;
 
-const BACKDROP_FRAGMENT = /* glsl */ `
-  precision highp float;
-  varying vec2 vUv;
-  uniform float uTime;
-  uniform float uScroll;
-  uniform float uAspect;
-  uniform float uPower;
-  uniform vec2 uPointer;
-  uniform vec3 uA;
-  uniform vec3 uB;
-  uniform vec3 uC;
-
-  // Simplex noise, Ian McEwan / Ashima Arts (MIT).
-  vec3 mod289(vec3 x) { return x - floor(x * (1.0 / 289.0)) * 289.0; }
-  vec4 mod289(vec4 x) { return x - floor(x * (1.0 / 289.0)) * 289.0; }
-  vec4 permute(vec4 x) { return mod289(((x * 34.0) + 1.0) * x); }
-  vec4 taylorInvSqrt(vec4 r) { return 1.79284291400159 - 0.85373472095314 * r; }
-  float snoise(vec3 v) {
-    const vec2 C = vec2(1.0 / 6.0, 1.0 / 3.0);
-    const vec4 D = vec4(0.0, 0.5, 1.0, 2.0);
-    vec3 i = floor(v + dot(v, C.yyy));
-    vec3 x0 = v - i + dot(i, C.xxx);
-    vec3 g = step(x0.yzx, x0.xyz);
-    vec3 l = 1.0 - g;
-    vec3 i1 = min(g.xyz, l.zxy);
-    vec3 i2 = max(g.xyz, l.zxy);
-    vec3 x1 = x0 - i1 + C.xxx;
-    vec3 x2 = x0 - i2 + C.yyy;
-    vec3 x3 = x0 - D.yyy;
-    i = mod289(i);
-    vec4 p = permute(permute(permute(i.z + vec4(0.0, i1.z, i2.z, 1.0)) + i.y + vec4(0.0, i1.y, i2.y, 1.0)) + i.x + vec4(0.0, i1.x, i2.x, 1.0));
-    float n_ = 0.142857142857;
-    vec3 ns = n_ * D.wyz - D.xzx;
-    vec4 j = p - 49.0 * floor(p * ns.z * ns.z);
-    vec4 x_ = floor(j * ns.z);
-    vec4 y_ = floor(j - 7.0 * x_);
-    vec4 x = x_ * ns.x + ns.yyyy;
-    vec4 y = y_ * ns.x + ns.yyyy;
-    vec4 h = 1.0 - abs(x) - abs(y);
-    vec4 b0 = vec4(x.xy, y.xy);
-    vec4 b1 = vec4(x.zw, y.zw);
-    vec4 s0 = floor(b0) * 2.0 + 1.0;
-    vec4 s1 = floor(b1) * 2.0 + 1.0;
-    vec4 sh = -step(h, vec4(0.0));
-    vec4 a0 = b0.xzyw + s0.xzyw * sh.xxyy;
-    vec4 a1 = b1.xzyw + s1.xzyw * sh.zzww;
-    vec3 p0 = vec3(a0.xy, h.x);
-    vec3 p1 = vec3(a0.zw, h.y);
-    vec3 p2 = vec3(a1.xy, h.z);
-    vec3 p3 = vec3(a1.zw, h.w);
-    vec4 norm = taylorInvSqrt(vec4(dot(p0, p0), dot(p1, p1), dot(p2, p2), dot(p3, p3)));
-    p0 *= norm.x; p1 *= norm.y; p2 *= norm.z; p3 *= norm.w;
-    vec4 m = max(0.6 - vec4(dot(x0, x0), dot(x1, x1), dot(x2, x2), dot(x3, x3)), 0.0);
-    m = m * m;
-    return 42.0 * dot(m * m, vec4(dot(p0, x0), dot(p1, x1), dot(p2, x2), dot(p3, x3)));
-  }
-  float hash(vec2 p) { return fract(sin(dot(p, vec2(12.9898, 78.233))) * 43758.5453); }
-
+const FLOW_FRAGMENT = /* glsl */ `
+  varying vec3 vColor;
+  varying float vAlpha;
   void main() {
-    vec2 p = (vUv - 0.5) * vec2(uAspect, 1.0);
-    float t = uTime * 0.04;
-
-    // The whole field slides upward as the page scrolls.
-    vec2 q = p * 0.82 + vec2(0.0, -uScroll * 0.42);
-
-    // Two slow warps bend the field so nothing in it moves in a straight line.
-    float w1 = snoise(vec3(q * 0.62, t));
-    float w2 = snoise(vec3(q * 0.62 + 7.3, t * 1.15 + 2.0));
-    vec2 wq = q + 0.42 * vec2(w1, w2);
-    float f = snoise(vec3(wq * 0.95, t * 0.7));
-
-    // Light: three broad lobes, one per palette colour, each leaning toward its own part of the screen.
-    float la = smoothstep(-0.45, 0.85, f + p.x * 0.25);
-    float lb = smoothstep(-0.35, 0.95, w1 * 0.9 + p.x * 0.3 - p.y * 0.35);
-    float lc = smoothstep(-0.3, 1.0, w2 * 0.95 - p.x * 0.4 + p.y * 0.25);
-    vec3 col = vec3(0.014, 0.030, 0.046);
-    col += uA * pow(la, 1.7) * 0.50 * uPower;
-    col += uB * pow(lb, 2.0) * 0.44 * uPower;
-    col += uC * pow(lc, 2.0) * 0.40 * uPower;
-
-    // Strata: contour lines of the same field, brighter where the light is and near the pointer.
-    float level = f * 6.0 + w1 * 1.4;
-    float width = fwidth(level);
-    float line = 1.0 - smoothstep(0.0, width * 1.5, abs(fract(level) - 0.5));
-    float bold = 1.0 - smoothstep(0.0, width * 2.4, abs(fract(level * 0.25) - 0.5) * 4.0);
-    vec2 toPointer = p - uPointer * vec2(uAspect, 1.0) * 0.5;
-    float torch = exp(-dot(toPointer, toPointer) * 5.0);
-    vec3 lineColour = mix(uA, uB, smoothstep(-0.5, 0.6, w1)) + 0.25;
-    float lineStrength = 0.06 + 0.20 * la + 0.10 * bold + 0.36 * torch;
-    col += lineColour * line * lineStrength * uPower;
-
-    // Hold the edges down so type stays readable, then dither away any banding.
-    float edge = smoothstep(0.3, 1.1, length(p * vec2(0.72, 1.0)));
-    col *= 1.0 - 0.46 * edge;
-    col += (hash(gl_FragCoord.xy + uTime) - 0.5) / 160.0;
-    gl_FragColor = vec4(col, 1.0);
+    gl_FragColor = vec4(vColor, vAlpha);
   }
 `;
 
-function Backdrop({ still }) {
-  const material = useRef();
-  const { size } = useThree();
-  const uniforms = useMemo(
-    () => ({
-      uTime: { value: 0 },
-      uScroll: { value: 0 },
-      uAspect: { value: 1 },
-      uPower: { value: 1 },
-      uPointer: { value: new THREE.Vector2(0, 0) },
-      uA: { value: new THREE.Vector3(...PALETTES[0].a) },
-      uB: { value: new THREE.Vector3(...PALETTES[0].b) },
-      uC: { value: new THREE.Vector3(...PALETTES[0].c) }
-    }),
-    []
-  );
-  // Flattened palette table: a(3) b(3) c(3) power(1). The work row is rewritten with the live project colour.
-  const table = useMemo(() => PALETTES.map(p => [...p.a, ...p.b, ...p.c, p.power]), []);
-  const target = useMemo(() => new Array(10).fill(0), []);
-  const live = useRef(null);
-  const accent = useRef(PALETTES[WORK].a.slice());
-
-  useFrame(({ clock }, delta) => {
-    const dt = Math.min(delta, 0.05);
-    const u = material.current.uniforms;
-
-    // In the work section the backdrop takes the colour of the project on screen.
-    const wanted = sceneState.accent ? hex(sceneState.accent) : PALETTES[WORK].a;
-    for (let k = 0; k < 3; k++) {
-      accent.current[k] = damp(accent.current[k], wanted[k], 3, dt);
-      table[WORK][k] = accent.current[k];
-      table[WORK][3 + k] = accent.current[k] * 0.55 + PALETTES[WORK].b[k] * 0.45;
+function threadGeometry(threads, segments) {
+  const count = threads * (segments + 1);
+  const u = new Float32Array(count);
+  const seed = new Float32Array(count);
+  const index = new Uint32Array(threads * segments * 2);
+  let k = 0;
+  for (let i = 0; i < threads; i++) {
+    for (let j = 0; j <= segments; j++) {
+      const v = i * (segments + 1) + j;
+      u[v] = j / segments;
+      seed[v] = (i + 0.5) / threads;
+      if (j < segments) {
+        index[k++] = v;
+        index[k++] = v + 1;
+      }
     }
+  }
+  const geometry = new THREE.BufferGeometry();
+  geometry.setAttribute('position', new THREE.BufferAttribute(new Float32Array(count * 3), 3));
+  geometry.setAttribute('aU', new THREE.BufferAttribute(u, 1));
+  geometry.setAttribute('aSeed', new THREE.BufferAttribute(seed, 1));
+  geometry.setIndex(new THREE.BufferAttribute(index, 1));
+  return geometry;
+}
 
-    mixInto(target, table);
+function Ribbon({ threads, segments, spread, warmShare, gain, phaseShift = 0, flow, ...props }) {
+  const geometry = useMemo(() => threadGeometry(threads, segments), [threads, segments]);
+  const material = useMemo(
+    () =>
+      new THREE.ShaderMaterial({
+        vertexShader: FLOW_VERTEX,
+        fragmentShader: FLOW_FRAGMENT,
+        uniforms: {
+          uPhase: { value: 0 },
+          uGain: { value: 0 },
+          uSpread: { value: spread },
+          uFocus: { value: 13 },
+          uWarmShare: { value: warmShare },
+          uCool: { value: COOL.clone() },
+          uWarm: { value: WARM.clone() }
+        },
+        transparent: true,
+        depthWrite: false,
+        depthTest: false,
+        blending: THREE.AdditiveBlending
+      }),
+    [spread, warmShare]
+  );
+  useEffect(
+    () => () => {
+      geometry.dispose();
+      material.dispose();
+    },
+    [geometry, material]
+  );
+
+  useFrame(() => {
+    const u = material.uniforms;
+    u.uPhase.value = flow.current.phase + phaseShift;
+    u.uGain.value = flow.current.gain * gain;
+    u.uFocus.value = flow.current.focus;
+    u.uCool.value.copy(flow.current.cool);
+    u.uWarm.value.copy(flow.current.warm);
+  });
+
+  return <lineSegments geometry={geometry} material={material} frustumCulled={false} renderOrder={-5} {...props} />;
+}
+
+function Flow({ still }) {
+  const group = useRef();
+  const { size } = useThree();
+  const tall = size.width / size.height < 1;
+  const target = useMemo(() => new Array(7).fill(0), []);
+  const live = useRef(null);
+  const flow = useRef({ phase: 3, gain: 0, focus: 13, cool: COOL.clone(), warm: WARM.clone() });
+  const scroll = useRef({ last: window.scrollY, speed: 0 });
+  const accent = useMemo(() => new THREE.Color(), []);
+
+  useEffect(() => {
+    live.current = null;
+  }, [tall]);
+
+  useFrame((_, delta) => {
+    const dt = Math.min(delta, 0.05);
+    mixInto(target, tall ? FLOW.tall : FLOW.wide);
     const values = live.current || (live.current = target.slice());
-    for (let k = 0; k < values.length; k++) values[k] = damp(values[k], target[k], still ? 60 : 2.6, dt);
-    u.uA.value.set(values[0], values[1], values[2]);
-    u.uB.value.set(values[3], values[4], values[5]);
-    u.uC.value.set(values[6], values[7], values[8]);
-    u.uPower.value = values[9];
-    u.uTime.value = still ? 12 : clock.elapsedTime + 12;
-    u.uScroll.value = window.scrollY / window.innerHeight;
-    u.uAspect.value = size.width / size.height;
-    u.uPointer.value.x = damp(u.uPointer.value.x, sceneState.pointerX, 4, dt);
-    u.uPointer.value.y = damp(u.uPointer.value.y, -sceneState.pointerY, 4, dt);
+    for (let k = 0; k < values.length; k++) values[k] = damp(values[k], target[k], still ? 60 : 2.2, dt);
+    const [x, y, z, rx, ry, rz, gain] = values;
+
+    // Scrolling makes the light run faster along the threads.
+    const s = scroll.current;
+    const moved = Math.abs(window.scrollY - s.last) / Math.max(1, window.innerHeight);
+    s.last = window.scrollY;
+    s.speed = damp(s.speed, Math.min(3, moved / Math.max(dt, 0.001)), 4, dt);
+    if (!still) flow.current.phase += dt * (0.45 + s.speed * 1.6);
+
+    // In the work section the threads take on the colour of the project on top of the stack.
+    const f = flow.current;
+    if (sceneState.accent) accent.set(sceneState.accent).lerp(COOL, 0.35);
+    else accent.copy(COOL);
+    f.cool.lerp(accent, 1 - Math.exp(-3 * dt));
+    f.gain = gain * (sceneState.paused ? 0 : 1);
+    f.focus = 10 - z;
+
+    group.current.position.set(x, y, z);
+    group.current.rotation.set(rx + sceneState.pointerY * 0.05, ry + sceneState.pointerX * 0.08, rz);
+    group.current.scale.setScalar(tall ? 0.6 : 1);
   });
 
   return (
-    <mesh frustumCulled={false} renderOrder={-1000}>
-      <planeGeometry args={[2, 2]} />
-      <shaderMaterial ref={material} vertexShader={BACKDROP_VERTEX} fragmentShader={BACKDROP_FRAGMENT} uniforms={uniforms} depthTest={false} depthWrite={false} />
-    </mesh>
+    <group ref={group}>
+      <Ribbon threads={tall ? 120 : 180} segments={tall ? 120 : 150} spread={2.6} warmShare={0.12} gain={tall ? 0.75 : 1} flow={flow} />
+      {/* A fainter, wider echo further back gives the ribbon depth. */}
+      <Ribbon threads={tall ? 50 : 80} segments={100} spread={4.2} warmShare={0.05} gain={0.55} phaseShift={7} flow={flow} position={[0, 1.6, -4]} rotation={[0.6, 0.2, -0.3]} />
+    </group>
   );
 }
 
@@ -384,7 +410,6 @@ function Slab({ layer, index, rig, glow }) {
   const halo = useRef();
   const texture = useMemo(() => labelTexture(layer), [layer]);
   const edges = useMemo(() => new THREE.EdgesGeometry(new THREE.BoxGeometry(...SLAB)), []);
-  const tint = useMemo(() => new THREE.Color(layer.color).multiplyScalar(0.2).add(new THREE.Color('#06141b')), [layer]);
   const lift = useRef(0);
 
   useEffect(() => () => texture.dispose(), [texture]);
@@ -399,11 +424,12 @@ function Slab({ layer, index, rig, glow }) {
     group.current.position.x = lift.current * 0.32;
     group.current.position.z = lift.current * 0.32;
     const fade = opacity * (dimmed ? 0.35 : 1);
-    body.current.opacity = damp(body.current.opacity, 0.9 * fade, 8, dt);
-    body.current.emissiveIntensity = 0.16 + lift.current * 0.22;
-    edge.current.opacity = damp(edge.current.opacity, (0.75 + lift.current * 0.25) * fade, 8, dt);
-    label.current.opacity = damp(label.current.opacity, (0.9 + lift.current * 0.1) * fade, 8, dt);
-    halo.current.opacity = damp(halo.current.opacity, (0.1 + lift.current * 0.3) * fade, 8, dt);
+    body.current.opacity = damp(body.current.opacity, 0.94 * fade, 8, dt);
+    body.current.emissiveIntensity = 0.05 + lift.current * 0.3;
+    edge.current.opacity = damp(edge.current.opacity, (0.62 + lift.current * 0.38) * fade, 8, dt);
+    label.current.opacity = damp(label.current.opacity, (0.82 + lift.current * 0.18) * fade, 8, dt);
+    halo.current.opacity = damp(halo.current.opacity, lift.current * 0.3 * fade, 8, dt);
+    halo.current.visible = halo.current.opacity > 0.01;
   });
 
   return (
@@ -415,18 +441,7 @@ function Slab({ layer, index, rig, glow }) {
       </mesh>
       <mesh>
         <boxGeometry args={SLAB} />
-        <meshPhysicalMaterial
-          ref={body}
-          color={tint}
-          emissive={layer.color}
-          emissiveIntensity={0.16}
-          roughness={0.22}
-          metalness={0.35}
-          clearcoat={1}
-          clearcoatRoughness={0.18}
-          transparent
-          opacity={0}
-        />
+        <meshStandardMaterial ref={body} color="#0a161d" emissive={layer.color} emissiveIntensity={0.05} roughness={0.28} metalness={0.65} transparent opacity={0} />
       </mesh>
       <lineSegments geometry={edges}>
         <lineBasicMaterial ref={edge} color={layer.color} transparent opacity={0} toneMapped={false} />
@@ -494,7 +509,6 @@ function Ring({ rig, radius, tilt, speed, color, still }) {
 
 function Stack({ still }) {
   const group = useRef();
-  const aura = useRef();
   const { size } = useThree();
   const aspect = size.width / size.height;
   const tall = aspect < 1;
@@ -527,14 +541,10 @@ function Stack({ still }) {
     group.current.scale.setScalar(scale * fit);
     group.current.rotation.x = rotX + sceneState.pointerY * 0.07 + Math.sin(time * 0.45) * 0.025;
     group.current.rotation.y = rotY + sceneState.pointerX * 0.16 + Math.sin(time * 0.3) * 0.1;
-    aura.current.material.opacity = 0.2 * opacity;
   });
 
   return (
     <group ref={group}>
-      <sprite ref={aura} scale={[9, 9, 1]} renderOrder={-10}>
-        <spriteMaterial map={glow} color="#3fd8c8" transparent opacity={0} depthWrite={false} depthTest={false} blending={THREE.AdditiveBlending} toneMapped={false} />
-      </sprite>
       {LAYERS.map((layer, index) => (
         <Slab key={layer.letter} layer={layer} index={index} rig={rig} glow={glow} />
       ))}
@@ -550,7 +560,7 @@ function Stack({ still }) {
 function Dust({ still }) {
   const points = useRef();
   const geometry = useMemo(() => {
-    const count = 900;
+    const count = 650;
     const positions = new Float32Array(count * 3);
     const colors = new Float32Array(count * 3);
     const teal = new THREE.Color('#5fe3d4');
@@ -594,7 +604,7 @@ function Dust({ still }) {
 
   return (
     <points ref={points} geometry={geometry}>
-      <pointsMaterial size={0.05} sizeAttenuation vertexColors transparent opacity={0.85} depthWrite={false} blending={THREE.AdditiveBlending} toneMapped={false} />
+      <pointsMaterial size={0.042} sizeAttenuation vertexColors transparent opacity={0.6} depthWrite={false} blending={THREE.AdditiveBlending} toneMapped={false} />
     </points>
   );
 }
@@ -610,7 +620,10 @@ function Pause() {
 }
 
 export default function Scene() {
-  const [dpr, setDpr] = useState(() => Math.min(window.devicePixelRatio || 1, 1.6));
+  const [dpr, setDpr] = useState(() => Math.min(window.devicePixelRatio || 1, window.matchMedia('(pointer: coarse)').matches ? 1.35 : 1.5));
+  // Multisampling is only worth its cost on low-density screens; on phones and retina displays the pixels
+  // are small enough that thin lines look clean without it.
+  const [antialias] = useState(() => (window.devicePixelRatio || 1) < 1.5);
   const still = prefersReducedMotion();
 
   useEffect(() => {
@@ -627,17 +640,21 @@ export default function Scene() {
     <Canvas
       dpr={dpr}
       camera={{ position: [0, 0, 10], fov: 35, near: 0.1, far: 60 }}
-      gl={{ antialias: true, alpha: false, powerPreference: 'high-performance' }}
-      style={{ position: 'fixed', inset: 0, pointerEvents: 'none' }}
+      gl={{ antialias, alpha: false, powerPreference: 'high-performance' }}
+      // The canvas is fixed, so it never needs re-measuring on scroll.
+      resize={{ scroll: false, debounce: { scroll: 0, resize: 150 } }}
+      onCreated={({ gl }) => gl.setClearColor('#04080b')}
+      style={{ position: 'absolute', inset: 0, pointerEvents: 'none' }}
       aria-hidden="true"
     >
-      <PerformanceMonitor onDecline={() => setDpr(value => Math.max(0.7, value - 0.35))} />
+      {/* On a struggling device, step the resolution down, but never below one pixel per CSS pixel. */}
+      <PerformanceMonitor onDecline={() => setDpr(value => Math.max(1, value - 0.25))} />
       <Pause />
       <Director />
-      <Backdrop still={still} />
-      <ambientLight intensity={0.9} />
+      <Flow still={still} />
+      <ambientLight intensity={0.55} />
       <directionalLight position={[4, 6, 5]} intensity={2.6} color="#ffe2c4" />
-      <pointLight position={[-5, 1, 3]} intensity={40} color="#5fe3d4" />
+      <pointLight position={[-5, 1, 3]} intensity={34} color="#5fe3d4" />
       <pointLight position={[3, -3, 4]} intensity={24} color="#ff9a4d" />
       <Dust still={still} />
       <Stack still={still} />

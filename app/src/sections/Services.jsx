@@ -11,7 +11,7 @@ function Face({ service, index }) {
     <Tilt className="group h-full rounded-[clamp(16px,2vw,24px)]">
       <div className="relative flex h-full flex-col overflow-hidden rounded-[inherit] panel border p-[clamp(14px,2.2vw,28px)] transition-colors duration-500 group-hover:border-sodium/60 preserve-3d">
         <span
-          className="pointer-events-none absolute -right-10 -top-12 size-44 rounded-full bg-sodium/15 opacity-0 blur-3xl transition-opacity duration-700 group-hover:opacity-100"
+          className="pointer-events-none absolute -right-16 -top-16 size-56 bg-[radial-gradient(closest-side,rgb(255_154_77/0.18),transparent)] opacity-0 transition-opacity duration-700 group-hover:opacity-100"
           aria-hidden="true"
         />
         <div className="flex items-start justify-between" style={{ transform: 'translateZ(36px)' }}>
@@ -71,7 +71,7 @@ function DealtCard({ service, index, columns, progress }) {
   const scale = useTransform(progress, range, [0.86, 1], { clamp: true });
 
   return (
-    <motion.li className="relative" style={{ x, y, rotate, scale, zIndex: services.length - index, transformPerspective: 1400 }}>
+    <motion.li className="relative will-change-transform" style={{ x, y, rotate, scale, zIndex: services.length - index, transformPerspective: 1400 }}>
       <motion.div className="relative h-full preserve-3d" style={{ rotateY }}>
         <div className="h-full [backface-visibility:hidden] preserve-3d">
           <Face service={service} index={index} />
