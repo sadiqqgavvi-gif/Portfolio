@@ -73,7 +73,7 @@ export default function Contact() {
           </span>
         </Reveal>
 
-        <ul className="m-0 mt-[clamp(40px,8vh,90px)] grid list-none grid-cols-1 gap-3 p-0 sm:grid-cols-2 lg:w-[62%]">
+        <ul className="m-0 mt-[clamp(40px,8vh,90px)] grid list-none grid-cols-1 gap-[clamp(8px,1.2vw,12px)] p-0 min-[480px]:grid-cols-2 lg:w-[62%]">
           {channels.map((item, index) => (
             <motion.li
               key={item.label}
@@ -86,7 +86,7 @@ export default function Contact() {
               <a
                 href={item.href}
                 {...(item.external ? { target: '_blank', rel: 'noopener' } : {})}
-                className="group relative flex items-center justify-between gap-4 overflow-hidden rounded-2xl border border-line bg-ink-2/70 px-5 py-4 no-underline backdrop-blur-md transition-colors duration-500 hover:border-sodium hover:text-ink"
+                className="group relative flex items-center justify-between gap-4 overflow-hidden panel rounded-2xl border px-5 py-4 no-underline transition-colors duration-500 hover:border-sodium hover:text-ink"
               >
                 <span className="absolute inset-0 origin-bottom scale-y-0 bg-sodium transition-transform duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:scale-y-100" aria-hidden="true" />
                 <span className="relative">

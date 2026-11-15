@@ -2,6 +2,7 @@
 // hovering a row or opening an overlay never re-renders React just to move a mesh.
 export const sceneState = {
   highlight: -1, // index of the stack layer to lift, or -1
+  accent: null, // colour of the project on screen, or null outside the work section
   pointerX: 0,
   pointerY: 0,
   paused: false // true while a full-screen overlay covers the stage

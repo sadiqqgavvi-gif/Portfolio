@@ -1,9 +1,10 @@
-import { useRef } from 'react';
-import { motion, useMotionValue, useReducedMotion, useScroll, useSpring, useTransform } from 'motion/react';
+import { useEffect, useRef } from 'react';
+import { motion, useMotionValue, useMotionValueEvent, useReducedMotion, useScroll, useSpring, useTransform } from 'motion/react';
 import { ArrowUpRight, Maximize2 } from 'lucide-react';
 import { projects } from '../data/projects.js';
 import { site } from '../data/site.js';
 import { useMediaQuery } from '../lib/hooks.js';
+import { sceneState } from '../lib/scene-state.js';
 import SectionHead from '../components/SectionHead.jsx';
 import Reveal from '../components/Reveal.jsx';
 import Button from '../components/Button.jsx';
@@ -47,7 +48,7 @@ function Stage({ project, enter, onOpen }) {
       ref={ref}
       onPointerMove={onMove}
       onPointerLeave={onLeave}
-      className="group/stage relative h-full min-h-[240px] w-full [perspective:1500px]"
+      className="group/stage relative h-full min-h-[120px] w-full [container-type:size] [perspective:1500px] lg:min-h-[240px]"
     >
       <span
         className="pointer-events-none absolute inset-[8%] rounded-full opacity-50 blur-[70px] transition-opacity duration-700 group-hover/stage:opacity-80"
@@ -63,14 +64,14 @@ function Stage({ project, enter, onOpen }) {
             <Shot shot={project.floatShot} sizes="(min-width: 1024px) 26vw, 46vw" />
           </motion.div>
         )}
-        <motion.div className="relative block w-[86%]" style={{ y: frameY, scale: frameScale }}>
+        <motion.div className="relative block w-[min(86cqw,calc((100cqh-36px)*1.5))]" style={{ y: frameY, scale: frameScale }}>
           <BrowserFrame address={project.address}>
             <Shot shot={project.heroShot} alt={`${project.name}: ${project.shots[0].caption}`} sizes="(min-width: 1024px) 44vw, 80vw" />
           </BrowserFrame>
         </motion.div>
         {project.phoneShot && (
           <motion.div
-            className={`absolute bottom-[1%] left-[-1%] ${isPopup ? 'w-[26%]' : 'w-[19%]'}`}
+            className={`absolute bottom-[1%] left-[4%] lg:left-[-1%] ${isPopup ? 'w-[min(26cqw,36cqh)]' : 'w-[min(19cqw,26cqh)]'}`}
             style={{ x: phoneX, y: phoneY, z: 110 }}
           >
             {isPopup ? (
@@ -101,34 +102,35 @@ function Stage({ project, enter, onOpen }) {
   );
 }
 
-function ProjectCard({ project, index, enter, onOpen, className = '' }) {
+function ProjectCard({ project, index, enter, onOpen, pinned = false, className = '' }) {
   const shown = project.chips.slice(0, 6);
+  const compact = 'max-sm:!px-3.5 max-sm:!py-2.5 max-sm:!text-[0.72rem]';
   return (
     <article
       aria-labelledby={`project-${project.id}`}
-      className={`relative grid grid-cols-[minmax(0,1fr)] overflow-hidden rounded-[clamp(20px,2.4vw,36px)] border border-white/12 bg-ink-2 lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] ${className}`}
+      className={`relative grid grid-cols-[minmax(0,1fr)] grid-rows-[minmax(0,1fr)_auto] overflow-hidden rounded-[clamp(20px,2.4vw,36px)] border border-white/14 bg-[#07141b] lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] lg:grid-rows-1 ${className}`}
       style={{
         '--accent': project.accent,
-        backgroundImage: `radial-gradient(90% 120% at 100% 0%, color-mix(in srgb, ${project.accent} 20%, transparent), transparent 62%), radial-gradient(60% 80% at 0% 100%, color-mix(in srgb, ${project.accent} 9%, transparent), transparent 70%)`
+        backgroundImage: `radial-gradient(90% 120% at 100% 0%, color-mix(in srgb, ${project.accent} 26%, transparent), transparent 62%), radial-gradient(60% 80% at 0% 100%, color-mix(in srgb, ${project.accent} 12%, transparent), transparent 70%)`
       }}
     >
-      <div className="relative z-10 order-2 flex flex-col p-[clamp(20px,3vw,44px)] lg:order-1">
+      <div className="relative z-10 order-2 flex flex-col p-[clamp(16px,3vw,44px)] max-lg:pt-1 lg:order-1">
         <div className="flex items-center justify-between gap-4">
-          <span className="rounded-full border px-3 py-1.5 font-mono text-[0.68rem] uppercase tracking-widest" style={{ borderColor: `${project.accent}66`, color: project.accent }}>
+          <span className="truncate rounded-full border px-3 py-1.5 font-mono text-[clamp(0.58rem,0.5rem+0.4vw,0.68rem)] uppercase tracking-wider sm:tracking-widest" style={{ borderColor: `${project.accent}66`, color: project.accent }}>
             {project.tag}
           </span>
-          <span className="font-mono text-xs tracking-widest text-fog" aria-hidden="true">
+          <span className="shrink-0 whitespace-nowrap font-mono text-xs tracking-widest text-fog" aria-hidden="true">
             {pad(index + 1)} / {pad(projects.length)}
           </span>
         </div>
 
-        <h3 id={`project-${project.id}`} className="display mt-[clamp(14px,2.4vh,30px)] text-[clamp(3rem,1.6rem+5vw,6.4rem)] leading-[0.84]">
+        <h3 id={`project-${project.id}`} className="display mt-[clamp(10px,2.4vh,30px)] text-[clamp(2.7rem,1.6rem+5vw,6.4rem)] leading-[0.84]">
           {project.name}
         </h3>
-        <p className="eyebrow mt-2.5">{project.kind}</p>
-        <p className="mt-[clamp(10px,1.8vh,20px)] max-w-[34em] text-[0.98rem] leading-relaxed text-bone/85">{project.lede}</p>
+        <p className="eyebrow mt-2 max-lg:text-[0.66rem]">{project.kind}</p>
+        <p className="mt-[clamp(8px,1.8vh,20px)] max-w-[34em] text-[clamp(0.88rem,0.84rem+0.3vw,0.98rem)] leading-relaxed text-bone/85 max-lg:line-clamp-4 max-lg:leading-snug max-lg:[@media(max-height:720px)]:line-clamp-2">{project.lede}</p>
 
-        <dl className="m-0 mt-[clamp(12px,2.2vh,26px)] grid grid-cols-3 gap-3 border-y border-line py-3.5">
+        <dl className="m-0 mt-[clamp(10px,2.2vh,26px)] grid grid-cols-3 gap-3 border-y border-line py-[clamp(8px,1.4vh,14px)] max-lg:[@media(max-height:620px)]:hidden">
           {project.highlights.map(item => (
             <div key={item.label} className="min-w-0">
               <dt className="sr-only">{item.label}</dt>
@@ -142,7 +144,7 @@ function ProjectCard({ project, index, enter, onOpen, className = '' }) {
           ))}
         </dl>
 
-        <ul className="m-0 mt-[clamp(12px,2vh,22px)] flex list-none flex-wrap gap-1.5 p-0">
+        <ul className="m-0 mt-[clamp(12px,2vh,22px)] flex list-none flex-wrap gap-1.5 p-0 max-lg:[@media(max-height:900px)]:hidden">
           {shown.map(chip => (
             <li key={chip} className="rounded-full border border-line bg-ink/40 px-2.5 py-1 font-mono text-[0.68rem] tracking-wide text-bone/80">
               {chip}
@@ -153,29 +155,29 @@ function ProjectCard({ project, index, enter, onOpen, className = '' }) {
           )}
         </ul>
 
-        <div className="mt-auto flex flex-wrap items-center gap-2.5 pt-[clamp(16px,2.6vh,30px)]">
-          <Button variant="solid" onClick={onOpen}>
+        <div className="mt-auto flex flex-wrap items-center gap-2 pt-[clamp(12px,2.6vh,30px)] sm:gap-2.5">
+          <Button variant="solid" onClick={onOpen} className={compact}>
             Case study
           </Button>
           {project.live && (
-            <Button href={project.live} external>
-              Live demo <ArrowUpRight size={15} strokeWidth={2.2} aria-hidden="true" />
+            <Button href={project.live} external className={compact} aria-label={`${project.name} live demo`}>
+              Live<span className="max-[430px]:hidden">&nbsp;demo</span> <ArrowUpRight size={15} strokeWidth={2.2} aria-hidden="true" />
             </Button>
           )}
-          <Button href={project.code} external aria-label={`${project.name} source code on GitHub`}>
+          <Button href={project.code} external className={compact} aria-label={`${project.name} source code on GitHub`}>
             <GitHubIcon width="16" height="16" /> Code
           </Button>
         </div>
       </div>
 
-      <div className="relative order-1 aspect-[16/11] p-[clamp(14px,2.4vw,36px)] lg:order-2 lg:aspect-auto">
+      <div className={`relative order-1 min-h-0 p-[clamp(12px,2.4vw,36px)] lg:order-2 ${pinned ? '' : 'aspect-[16/11] lg:aspect-auto'}`}>
         <Stage project={project} enter={enter} onOpen={onOpen} />
       </div>
     </article>
   );
 }
 
-/* Wide screens: every project is a full-height card that sticks under the nav. The next card slides up
+/* On every screen size each project is a full-height card that sticks under the nav. The next card slides up
    over it while the one underneath shrinks back and dims, so the four build into a stack. */
 // Extra scroll (as a fraction of the viewport) that each card holds its place before the next one arrives.
 const HOLD = 0.4;
@@ -193,8 +195,15 @@ function StickyCard({ project, index, travel, onOpen }) {
   return (
     <>
       <div className="sticky top-0 flex h-svh items-center pt-[var(--nav-h)]" style={{ zIndex: index + 1 }}>
-        <motion.div className="relative w-full origin-top" style={{ scale, y: lift, marginTop: index * 14 }}>
-          <ProjectCard project={project} index={index} enter={enter} onOpen={onOpen} className="h-[min(700px,calc(100svh-var(--nav-h)-64px))]" />
+        <motion.div className="relative w-full origin-top" style={{ scale, y: lift, marginTop: `calc(${index} * clamp(5px, 1vw, 14px))` }}>
+          <ProjectCard
+            project={project}
+            index={index}
+            enter={enter}
+            onOpen={onOpen}
+            pinned
+            className="h-[calc(100svh-var(--nav-h)-30px)] lg:h-[min(700px,calc(100svh-var(--nav-h)-64px))]"
+          />
           <motion.div className="pointer-events-none absolute inset-0 rounded-[clamp(20px,2.4vw,36px)] bg-ink" style={{ opacity: veil }} aria-hidden="true" />
         </motion.div>
       </div>
@@ -212,6 +221,18 @@ function StickyStack({ onOpen }) {
   // 0 → 1 while the first card rises into view, then +1 for every further card that reaches the top.
   const travel = useTransform([arriving, stacking], ([a, s]) => a + s * (count - 1));
 
+  // The backdrop behind the page takes the colour of whichever project is on top of the stack.
+  useMotionValueEvent(travel, 'change', value => {
+    const top = Math.min(count - 1, Math.max(0, Math.floor(value - 0.55)));
+    sceneState.accent = value > 0.15 ? projects[top].accent : null;
+  });
+  useEffect(
+    () => () => {
+      sceneState.accent = null;
+    },
+    []
+  );
+
   return (
     <div ref={ref} className="wrap relative mt-[clamp(20px,4vh,48px)]">
       {projects.map((project, index) => (
@@ -221,7 +242,7 @@ function StickyStack({ onOpen }) {
   );
 }
 
-// Phones and short windows: the cards simply follow one another, each rising and settling as it arrives.
+// Very short windows and reduced motion: the cards simply follow one another, each settling as it arrives.
 function FlowCard({ project, index, onOpen }) {
   const ref = useRef(null);
   const reduce = useReducedMotion();
@@ -240,7 +261,7 @@ function FlowCard({ project, index, onOpen }) {
 }
 
 export default function Work({ onOpen }) {
-  const sticky = useMediaQuery('(min-width: 1024px) and (min-height: 640px)');
+  const sticky = useMediaQuery('(min-height: 520px)');
   const reduce = useReducedMotion();
 
   return (
