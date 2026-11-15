@@ -51,8 +51,8 @@ function Stage({ project, enter, onOpen }) {
       className="group/stage relative h-full min-h-[120px] w-full [container-type:size] [perspective:1500px] lg:min-h-[240px]"
     >
       <span
-        className="pointer-events-none absolute inset-[8%] rounded-full opacity-50 blur-[70px] transition-opacity duration-700 group-hover/stage:opacity-80"
-        style={{ background: `radial-gradient(closest-side, ${project.accent}, transparent)` }}
+        className="pointer-events-none absolute inset-0 opacity-40 transition-opacity duration-700 group-hover/stage:opacity-60"
+        style={{ background: `radial-gradient(closest-side, ${project.accent}, transparent 75%)` }}
         aria-hidden="true"
       />
       <motion.div className="absolute inset-0 flex items-center justify-center preserve-3d" style={{ rotateX, rotateY }}>
@@ -195,7 +195,7 @@ function StickyCard({ project, index, travel, onOpen }) {
   return (
     <>
       <div className="sticky top-0 flex h-svh items-center pt-[var(--nav-h)]" style={{ zIndex: index + 1 }}>
-        <motion.div className="relative w-full origin-top" style={{ scale, y: lift, marginTop: `calc(${index} * clamp(5px, 1vw, 14px))` }}>
+        <motion.div className="relative w-full origin-top will-change-transform" style={{ scale, y: lift, marginTop: `calc(${index} * clamp(5px, 1vw, 14px))` }}>
           <ProjectCard
             project={project}
             index={index}

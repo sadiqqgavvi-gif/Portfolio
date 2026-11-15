@@ -15,7 +15,7 @@ export const prefersReducedMotion = () =>
 export function startSmoothScroll() {
   if (lenis || prefersReducedMotion()) return () => {};
   // A slow, gliding scroll: the page eases toward the wheel target instead of jumping to it.
-  lenis = new Lenis({ lerp: 0.075, wheelMultiplier: 0.7, smoothWheel: true });
+  lenis = new Lenis({ lerp: 0.09, wheelMultiplier: 0.85, smoothWheel: true });
   lenis.on('scroll', ScrollTrigger.update);
   const tick = time => lenis && lenis.raf(time * 1000);
   gsap.ticker.add(tick);

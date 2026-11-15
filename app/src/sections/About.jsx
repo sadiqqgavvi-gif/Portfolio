@@ -15,6 +15,7 @@ export default function About() {
 
         {/* Each word sharpens and brightens as it crosses the viewport (React Bits ScrollReveal). */}
         <ScrollReveal
+          enableBlur={false}
           baseOpacity={0.12}
           baseRotation={2}
           blurStrength={5}
@@ -40,7 +41,7 @@ export default function About() {
                 spotlightColor="#ff9a4d"
                 intensity={0.2}
                 className="panel h-full !rounded-2xl !p-[clamp(16px,2vw,24px)]"
-                style={{ '--spotlight-card-surface': 'rgb(7 20 27 / 0.76)', '--spotlight-card-border': 'rgb(255 255 255 / 0.16)' }}
+                style={{ '--spotlight-card-surface': 'rgb(6 12 16 / 0.86)', '--spotlight-card-border': 'rgb(255 255 255 / 0.16)' }}
               >
                 <b className="display block text-[clamp(2.3rem,1.2rem+4.6vw,5.2rem)] leading-none text-bone">
                   <CountUp from={stat.from ?? 0} to={stat.to} separator={stat.separator ?? ''} suffix={stat.suffix ?? ''} duration={2.2} />

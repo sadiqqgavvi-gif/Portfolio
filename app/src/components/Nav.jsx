@@ -103,7 +103,7 @@ export default function Nav({ ready }) {
           <motion.div
             id="menu"
             data-lenis-prevent
-            className="fixed inset-0 z-[80] overflow-y-auto bg-ink/96 pt-[var(--nav-h)] backdrop-blur-xl lg:hidden"
+            className="fixed inset-0 z-[80] overflow-y-auto bg-ink/98 pt-[var(--nav-h)] lg:hidden"
             initial={{ clipPath: 'inset(0 0 100% 0)' }}
             animate={{ clipPath: 'inset(0 0 0% 0)' }}
             exit={{ clipPath: 'inset(0 0 100% 0)' }}

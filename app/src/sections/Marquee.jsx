@@ -4,7 +4,7 @@ import ScrollVelocity from '../components/reactbits/ScrollVelocity.jsx';
 // Two bands of type that run in opposite directions and speed up with the scroll (React Bits ScrollVelocity).
 export default function Marquee() {
   return (
-    <div className="relative z-10 -rotate-2 scale-105 border-y border-line bg-ink/55 py-4 backdrop-blur-sm sm:py-6" aria-hidden="true">
+    <div className="relative z-10 -rotate-2 scale-105 border-y border-line bg-ink/80 py-4 sm:py-6" aria-hidden="true">
       <ScrollVelocity
         texts={[marquee.tech.join('  ·  '), marquee.traits.join('  /  ')]}
         velocity={55}

@@ -66,7 +66,7 @@ export default function CaseStudy({ projectId, onClose, onNavigate }) {
   return createPortal(
     <div className="fixed inset-0 z-[120]" role="dialog" aria-modal="true" aria-label={`${project.name} case study`} style={{ '--accent': project.accent }}>
       <motion.div
-        className="absolute inset-0 bg-ink/75 backdrop-blur-md"
+        className="absolute inset-0 bg-ink/88"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}

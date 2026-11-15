@@ -78,18 +78,18 @@ export default function App() {
     <MotionConfig reducedMotion="user">
       <Preloader onDone={onDone} />
 
-      {/* Stage: ambient light, the 3D scene, grain and a vignette, all fixed behind the page. */}
-      <div className="pointer-events-none fixed inset-0 z-0" aria-hidden="true">
-        <div className="absolute inset-0 bg-[radial-gradient(60vmax_50vmax_at_78%_18%,rgb(95_211_199/0.11),transparent_60%),radial-gradient(50vmax_40vmax_at_12%_88%,rgb(255_154_77/0.09),transparent_60%)]" />
+      {/* Stage: the 3D scene, then a fixed film grain and a vignette, all behind the page. The wrapper is the
+          large viewport height so the canvas is not resized while a phone's address bar slides away. */}
+      <div className="pointer-events-none fixed inset-x-0 top-0 z-0 h-lvh bg-ink" aria-hidden="true">
         <StageBoundary>
           <Suspense fallback={null}>
-            <motion.div className="absolute inset-0" initial={{ opacity: 0 }} animate={{ opacity: ready ? 1 : 0 }} transition={{ duration: 2, delay: 0.3 }}>
+            <motion.div className="absolute inset-0" initial={{ opacity: 0 }} animate={{ opacity: ready ? 1 : 0 }} transition={{ duration: 2.4, delay: 0.2 }}>
               <Scene />
             </motion.div>
           </Suspense>
         </StageBoundary>
-        <div className="grain absolute -inset-1/2 animate-grain opacity-[0.07] mix-blend-overlay" />
-        <div className="absolute inset-0 bg-[radial-gradient(120%_90%_at_50%_45%,transparent_60%,rgb(0_0_0/0.35)_100%)]" />
+        <div className="grain absolute inset-0 opacity-[0.045]" />
+        <div className="absolute inset-0 bg-[radial-gradient(130%_95%_at_50%_42%,transparent_45%,rgb(0_0_0/0.72)_100%)]" />
       </div>
 
       <div id="page" className="relative z-[2]">
