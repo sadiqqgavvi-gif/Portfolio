@@ -61,7 +61,7 @@ export default function Preloader({ onDone }) {
             <motion.span>{label}</motion.span>
             <small className="ml-2 text-[0.28em] text-sodium">%</small>
           </span>
-          <span className="eyebrow hidden pb-3 sm:block">Loading the stage</span>
+          <span className="eyebrow hidden pb-3 sm:block">Loading portfolio</span>
         </div>
         <div className="mt-6 h-px w-full bg-line">
           <motion.div className="h-full origin-left bg-gradient-to-r from-teal to-sodium" style={{ scaleX: bar }} />

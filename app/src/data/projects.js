@@ -40,6 +40,23 @@ export const projects = [
       { title: 'Guardrails & fallback', text: 'Short, off-topic or gibberish answers are capped. OpenAI can write richer feedback, and the built-in engine takes over if that call fails.' },
       { title: 'Secure by default', text: 'bcrypt, Google sign-in, short-lived JWTs with rotating httpOnly refresh tokens, Helmet, a strict CORS allow-list and per-route rate limits.' }
     ],
+    challenges: [
+      {
+        title: 'A 30,000-question bank that loaded slowly',
+        problem: 'Parsing the Markdown question bank on every cold start took about a second, and picking questions shuffled 10,000 items per request.',
+        solution: 'Read the bank from a 155 KB pre-parsed cache in about 60 ms, and sample questions directly, so a request takes under 1 ms.'
+      },
+      {
+        title: 'Logins failing in strict browsers',
+        problem: 'Browsers that block third-party cookies dropped the httpOnly refresh cookie, which logged people out.',
+        solution: 'Kept rotating httpOnly refresh tokens as the default and added a Bearer-token fallback, so sessions survive either way.'
+      },
+      {
+        title: 'Feedback that must never go down',
+        problem: 'Scoring depended on the OpenAI API, which can fail or be switched off.',
+        solution: 'Built a five-criteria scoring engine that runs without AI, used it as the fallback, and capped scores with guardrails for off-topic or empty answers.'
+      }
+    ],
     meta: [
       ['Role', 'Solo build: design, frontend, backend'],
       ['Type', 'Final year project, BS Software Engineering'],
@@ -105,6 +122,23 @@ export const projects = [
       { title: 'Staff dashboard', text: 'A JWT-protected overview of revenue, active orders and best sellers, plus order, reservation and menu management.' },
       { title: '3D & motion', text: 'A 3D hero dish, a pinned orbit of dishes around a cloche, a horizontal scroll journey and a stacked card deck, tuned for performance.' }
     ],
+    challenges: [
+      {
+        title: 'Live updates on serverless hosting',
+        problem: 'Serverless functions cannot share one in-memory event bus, so Server-Sent Events alone missed status changes.',
+        solution: 'Combined Server-Sent Events with a light polling fallback on Vercel, while a long-running server gets updates instantly.'
+      },
+      {
+        title: 'Totals that clients could tamper with',
+        problem: 'Trusting prices sent from the browser would let a modified request change the bill.',
+        solution: 'The server recalculates every price and the tax from the database in a pure, unit-tested function, and the public tracking view hides contact details.'
+      },
+      {
+        title: '3D that stays smooth',
+        problem: 'Several WebGL scenes, pinned sections and smooth scrolling can drop frames on slower devices.',
+        solution: 'Off-screen WebGL pauses, the pixel ratio adapts on slow devices, and per-frame updates stick to compositor-friendly properties.'
+      }
+    ],
     meta: [
       ['Role', 'Solo build: design, frontend, backend'],
       ['Type', 'Full stack MERN web app'],
@@ -162,6 +196,23 @@ export const projects = [
       { title: 'Voice & video calls', text: 'One-to-one WebRTC calls with mute and camera toggles, signalled over Socket.io and logged in the chat.' },
       { title: 'Groups & control', text: 'Multiple admins, member management, pin, archive, mute and block, with light, dark and system themes.' }
     ],
+    challenges: [
+      {
+        title: 'Messages on a shaky connection',
+        problem: 'Waiting for the server before showing a message feels slow, and a dropped socket can lose messages.',
+        solution: 'Messages send optimistically, retry on failure and resync after a reconnect, so the conversation stays correct.'
+      },
+      {
+        title: 'Uploads that survive redeploys',
+        problem: 'Files saved to a server disk disappear when the app is redeployed.',
+        solution: 'Stored photos, videos, documents and voice notes in MongoDB GridFS, so no extra storage service is needed.'
+      },
+      {
+        title: 'Calls between two browsers',
+        problem: 'WebRTC needs a signalling channel and secure origins to reach the camera and microphone.',
+        solution: 'Used the existing Socket.io connection for signalling, logged missed and completed calls in the chat, and documented TURN for strict networks.'
+      }
+    ],
     meta: [
       ['Role', 'Solo build: design, frontend, backend'],
       ['Type', 'Full stack real-time web app'],
@@ -216,6 +267,23 @@ export const projects = [
       { title: 'Import & share', text: 'Import Chrome bookmarks or files from other browsers, then share a board as a code, Markdown or a standalone page.' },
       { title: 'Safe by design', text: 'Trash with 30-day restore, undo after every delete, a duplicate finder and optional sync through your own Chrome profile.' },
       { title: 'Make it yours', text: 'Themes that match the wallpaper, six accent colours, 25 built-in gradients or your own photo, and a privacy blur.' }
+    ],
+    challenges: [
+      {
+        title: 'Sync without a server',
+        problem: 'Chrome sync storage is small, but a bookmark library can be large.',
+        solution: 'The service worker compresses the library with gzip, splits it into chunks and stores them in chrome.storage.sync, about 1,500 links.'
+      },
+      {
+        title: 'No flash on a new tab',
+        problem: 'A new tab that paints the default theme before the saved one looks broken.',
+        solution: 'A tiny script applies the cached theme before anything else loads.'
+      },
+      {
+        title: 'Upgrades that keep your data',
+        problem: 'Version 2 replaced freeform board positions with a column layout.',
+        solution: 'A migration moves 1.x libraries to columns automatically, roughly keeping where each board was.'
+      }
     ],
     meta: [
       ['Role', 'Solo build: design and code'],

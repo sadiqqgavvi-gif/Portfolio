@@ -1,41 +1,34 @@
 @import 'tailwindcss';
 
 @theme {
-  --color-ink: #04080b;
-  --color-ink-2: #0a161d;
-  --color-ink-3: #10222b;
-  --color-bone: #e8ece6;
-  --color-fog: #93a5aa;
-  --color-sodium: #ff9a4d;
-  --color-teal: #5fd3c7;
-  --color-line: rgb(232 236 230 / 0.13);
+  --color-ink: #060608;
+  --color-ink-2: #0c0d10;
+  --color-ink-3: #131418;
+  --color-bone: #ededee;
+  --color-fog: #8b8d97;
+  --color-sodium: #ff8a3d;
+  --color-teal: #56d8c9;
+  --color-line: rgb(255 255 255 / 0.08);
 
-  --font-display: 'Big Shoulders Display Variable', 'Arial Narrow', 'Roboto Condensed', Impact, sans-serif;
-  --font-sans: 'Instrument Sans Variable', 'Segoe UI', system-ui, -apple-system, sans-serif;
-  --font-mono: 'JetBrains Mono Variable', ui-monospace, 'Cascadia Code', Consolas, monospace;
+  --font-display: 'Geist Variable', 'Inter', 'Segoe UI', system-ui, sans-serif;
+  --font-sans: 'Geist Variable', 'Inter', 'Segoe UI', system-ui, sans-serif;
+  --font-serif: 'Instrument Serif', 'Times New Roman', Georgia, serif;
+  --font-mono: 'Geist Mono Variable', ui-monospace, 'Cascadia Code', Consolas, monospace;
 
   --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
   --ease-soft: cubic-bezier(0.2, 0.7, 0.1, 1);
 
-  --animate-grain: grain 1.2s steps(6) infinite;
-  --animate-float: float 7s ease-in-out infinite;
   --animate-pulse-dot: pulse-dot 2.4s ease-out infinite;
   --animate-cue: cue 2.2s var(--ease-soft) infinite;
+  --animate-marquee: marquee var(--marquee-duration, 40s) linear infinite;
+  --animate-float: float 6s ease-in-out infinite;
+  --animate-spin-slow: spin 40s linear infinite;
+  --animate-border: border-spin 6s linear infinite;
+  --animate-shine: shine 6s ease-in-out infinite;
 
-  @keyframes grain {
-    0%, 100% { transform: translate(0, 0); }
-    20% { transform: translate(-3%, 2%); }
-    40% { transform: translate(2%, -3%); }
-    60% { transform: translate(-2%, -1%); }
-    80% { transform: translate(3%, 3%); }
-  }
-  @keyframes float {
-    0%, 100% { transform: translateY(0); }
-    50% { transform: translateY(-12px); }
-  }
   @keyframes pulse-dot {
-    0% { box-shadow: 0 0 0 0 rgb(95 211 199 / 0.55); }
-    100% { box-shadow: 0 0 0 12px rgb(95 211 199 / 0); }
+    0% { box-shadow: 0 0 0 0 rgb(74 222 128 / 0.55); }
+    100% { box-shadow: 0 0 0 10px rgb(74 222 128 / 0); }
   }
   @keyframes cue {
     0% { transform: scaleY(0); transform-origin: top; }
@@ -43,18 +36,39 @@
     55% { transform: scaleY(1); transform-origin: bottom; }
     100% { transform: scaleY(0); transform-origin: bottom; }
   }
+  @keyframes marquee {
+    from { transform: translate3d(0, 0, 0); }
+    to { transform: translate3d(-50%, 0, 0); }
+  }
+  @keyframes float {
+    0%, 100% { transform: translate3d(0, 0, 0); }
+    50% { transform: translate3d(0, -10px, 0); }
+  }
+  @keyframes border-spin {
+    to { --border-angle: 360deg; }
+  }
+  @keyframes shine {
+    0%, 60% { background-position: 200% 0; }
+    100% { background-position: -100% 0; }
+  }
+}
+
+@property --border-angle {
+  syntax: '<angle>';
+  inherits: false;
+  initial-value: 0deg;
 }
 
 @layer base {
   :root {
     color-scheme: dark;
     --gutter: clamp(18px, 4.5vw, 64px);
-    --nav-h: 72px;
+    --nav-h: 76px;
   }
   html {
     background: var(--color-ink);
     -webkit-text-size-adjust: 100%;
-    scrollbar-color: #1c3440 var(--color-ink);
+    scrollbar-color: #24252b var(--color-ink);
   }
   html.lenis, html.lenis body { height: auto; }
   .lenis.lenis-smooth { scroll-behavior: auto !important; }
@@ -64,14 +78,16 @@
     background: var(--color-ink);
     color: var(--color-bone);
     font-family: var(--font-sans);
-    font-size: clamp(1rem, 0.96rem + 0.2vw, 1.125rem);
+    font-size: clamp(1rem, 0.96rem + 0.2vw, 1.0625rem);
     line-height: 1.6;
     -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
     text-rendering: optimizeLegibility;
     overflow-x: hidden;
+    font-feature-settings: 'ss01', 'cv11';
   }
   ::selection { background: var(--color-sodium); color: var(--color-ink); }
-  :focus-visible { outline: 2px solid var(--color-sodium); outline-offset: 3px; border-radius: 4px; }
+  :focus-visible { outline: 2px solid var(--color-sodium); outline-offset: 3px; border-radius: 6px; }
   h1, h2, h3, h4 { text-wrap: balance; }
   p { text-wrap: pretty; }
   button { cursor: pointer; }
@@ -79,37 +95,55 @@
 
 @utility wrap {
   width: 100%;
-  max-width: 1480px;
+  max-width: 1320px;
   margin-inline: auto;
   padding-left: max(var(--gutter), env(safe-area-inset-left, 0px));
   padding-right: max(var(--gutter), env(safe-area-inset-right, 0px));
 }
 @utility eyebrow {
   font-family: var(--font-mono);
-  font-size: 0.78rem;
-  letter-spacing: 0.14em;
+  font-size: 0.74rem;
+  letter-spacing: 0.12em;
   text-transform: uppercase;
   color: var(--color-fog);
 }
+/* Large headings: tight, confident grotesk. */
 @utility display {
   font-family: var(--font-display);
-  font-weight: 800;
-  line-height: 0.9;
+  font-weight: 600;
+  line-height: 0.98;
+  letter-spacing: -0.045em;
+}
+/* Accent words set in an italic serif, the editorial touch most premium portfolios lean on. */
+@utility serif {
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-weight: 400;
   letter-spacing: -0.01em;
-  text-transform: uppercase;
+}
+@utility text-gradient {
+  background: linear-gradient(180deg, #ffffff 0%, #ffffff 40%, rgb(255 255 255 / 0.55) 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+@utility text-accent-gradient {
+  background: linear-gradient(100deg, #ffb27a 0%, #ff8a3d 45%, #ff5e7a 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
 }
 @utility text-outline {
   color: transparent;
-  -webkit-text-stroke: 1px rgb(232 236 230 / 0.42);
+  -webkit-text-stroke: 1px rgb(255 255 255 / 0.22);
 }
-/* Dark tinted surfaces. No backdrop-filter anywhere on the page: the WebGL stage behind everything redraws
-   every frame, and a live blur over it would be recomputed every frame too. */
+/* Surfaces. No backdrop-filter on anything that scrolls over animation: it is recomputed every frame. */
 @utility glass {
-  background: rgb(6 12 16 / 0.82);
+  background: rgb(14 15 19 / 0.78);
 }
 @utility panel {
-  background-color: rgb(6 12 16 / 0.86);
-  border-color: rgb(255 255 255 / 0.1);
+  background-color: rgb(12 13 16 / 0.92);
+  border-color: rgb(255 255 255 / 0.08);
 }
 @utility preserve-3d {
   transform-style: preserve-3d;
@@ -119,12 +153,83 @@
   &::-webkit-scrollbar { display: none; }
 }
 
-/* Film grain and vignette that sit over the 3D stage. */
 .grain {
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
 }
 
-/* Link with an underline that draws in from the left. */
+/* Thin grid that fades out toward the edges of whatever it sits in. */
+.grid-lines {
+  background-image:
+    linear-gradient(to right, rgb(255 255 255 / 0.045) 1px, transparent 1px),
+    linear-gradient(to bottom, rgb(255 255 255 / 0.045) 1px, transparent 1px);
+  background-size: 64px 64px;
+  -webkit-mask-image: radial-gradient(ellipse 70% 60% at 50% 40%, #000 30%, transparent 100%);
+  mask-image: radial-gradient(ellipse 70% 60% at 50% 40%, #000 30%, transparent 100%);
+}
+.dot-grid {
+  background-image: radial-gradient(rgb(255 255 255 / 0.12) 1px, transparent 1px);
+  background-size: 22px 22px;
+}
+
+/* Card whose border lights up around the pointer (Magic UI "Magic Card" idea). The card sets --mx/--my. */
+.spot-card {
+  --mx: -400px;
+  --my: -400px;
+  position: relative;
+  isolation: isolate;
+  background: rgb(12 13 16 / 0.92);
+  border: 1px solid rgb(255 255 255 / 0.08);
+}
+.spot-card::before {
+  content: '';
+  position: absolute;
+  inset: -1px;
+  border-radius: inherit;
+  padding: 1px;
+  background: radial-gradient(320px circle at var(--mx) var(--my), var(--spot, rgb(255 138 61 / 0.85)), transparent 45%);
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask: linear-gradient(#000 0 0) content-box exclude, linear-gradient(#000 0 0);
+  pointer-events: none;
+  z-index: 2;
+}
+.spot-card::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: radial-gradient(420px circle at var(--mx) var(--my), var(--spot-fill, rgb(255 138 61 / 0.07)), transparent 40%);
+  pointer-events: none;
+  z-index: -1;
+}
+
+/* A light that travels around a border (Magic UI "Border Beam" idea). */
+.border-beam {
+  position: relative;
+}
+.border-beam::before {
+  content: '';
+  position: absolute;
+  inset: -1px;
+  border-radius: inherit;
+  padding: 1px;
+  background: conic-gradient(from var(--border-angle), transparent 0deg, transparent 290deg, var(--beam, #ff8a3d) 330deg, #fff 350deg, transparent 360deg);
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask: linear-gradient(#000 0 0) content-box exclude, linear-gradient(#000 0 0);
+  animation: var(--animate-border);
+  pointer-events: none;
+}
+
+/* Text with a highlight that sweeps across it now and then. */
+.shine {
+  background: linear-gradient(110deg, currentColor 40%, #fff 50%, currentColor 60%) 0 0 / 200% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: var(--animate-shine);
+}
+
 .link-line {
   background-image: linear-gradient(currentColor, currentColor);
   background-size: 0% 1px;
@@ -140,4 +245,14 @@
     animation-iteration-count: 1 !important;
     scroll-behavior: auto !important;
   }
+}
+
+/* Light running along a wire in the AI workflow diagram. */
+.beam-dash {
+  stroke-dashoffset: 100;
+  animation: beam-run 2.6s cubic-bezier(0.45, 0, 0.25, 1) infinite;
+}
+@keyframes beam-run {
+  from { stroke-dashoffset: 100; }
+  to { stroke-dashoffset: -100; }
 }

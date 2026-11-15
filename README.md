@@ -6,12 +6,13 @@ Personal portfolio of Gavriel Sadiq, full stack web developer (MERN).
 
 ## Stack
 
-- **React 19 + Vite** with **Tailwind CSS 4**
-- **Three.js / React Three Fiber** for the 3D stage (the four floating layers of the stack)
-- **GSAP** (ScrollTrigger, SplitText) and **Motion** (Framer Motion) for scroll and interaction
-- **Lenis** for smooth scrolling
-- **React Bits** components in `app/src/components/reactbits/` (SplitText, ScrollReveal, ScrollVelocity,
-  RotatingText, DecryptedText, CountUp, ShinyText, SpotlightCard, Magnet)
+- **React 19 + Vite** with **Tailwind CSS 4**, set in Geist, Geist Mono and Instrument Serif
+- **Three.js / React Three Fiber** for the hero's liquid-chrome orb, and **cobe** for the globe
+- **Motion** (Framer Motion) for scroll and interaction, **Lenis** for smooth scrolling (driven by the GSAP ticker)
+- **simple-icons** for the brand logos and **lucide-react** for the UI icons
+- **React Bits** components in `app/src/components/reactbits/` (RotatingText, CountUp, Magnet)
+- Effects in the spirit of Aceternity UI and Magic UI, written for this site: spotlight cards, bento grid,
+  animated beams, orbiting logos, tracing beam, lamp and logo marquee
 
 ## Project layout
 
@@ -20,15 +21,21 @@ app/                  source (this is what you edit)
   index.html          page shell and SEO tags
   public/             files copied as-is: résumé, favicons, og-image, shots/ (project screenshots)
   src/
-    data/             all text content: site.js (about, skills, journey) and projects.js (the four projects)
-    sections/         Hero, About, Services, Stack, Work, Journey, Contact
-    components/       shared UI, the case-study overlay and the screenshot lightbox
-    three/Scene.jsx   the 3D scene
+    data/             all text content: site.js (about, services, process, skills) and projects.js
+                      (the four projects, their challenges and screenshots)
+    sections/         Hero, LogoMarquee, About (bento), Work, Services, Process, Skills, Contact
+    components/       shared UI, the case-study overlay, the screenshot lightbox and the globe
+    three/HeroOrb.jsx the hero's 3D orb
 index.html, assets/, shots/, …   the production build (generated, do not edit by hand)
 ```
 
 GitHub Pages serves this repository from the root of `main` with no build step, so the production build is
 committed at the repository root.
+
+## Performance
+
+The 3D orb and the globe only draw while they are on screen, nothing on the page uses a live
+`backdrop-filter` over moving content, and the background is static.
 
 ## Develop
 
