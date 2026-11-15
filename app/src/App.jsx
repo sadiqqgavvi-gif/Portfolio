@@ -1,37 +1,24 @@
-import { Component, lazy, Suspense, useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { AnimatePresence, motion, MotionConfig, useScroll, useSpring } from 'motion/react';
 import { scrollToTarget, startSmoothScroll } from './lib/scroll.js';
 import Preloader from './components/Preloader.jsx';
+import Backdrop from './components/Backdrop.jsx';
 import Nav from './components/Nav.jsx';
 import Cursor from './components/Cursor.jsx';
 import CaseStudy from './components/CaseStudy.jsx';
 import Hero from './sections/Hero.jsx';
-import Marquee from './sections/Marquee.jsx';
+import LogoMarquee from './sections/LogoMarquee.jsx';
 import About from './sections/About.jsx';
-import Services from './sections/Services.jsx';
-import Stack from './sections/Stack.jsx';
 import Work from './sections/Work.jsx';
-import Journey from './sections/Journey.jsx';
+import Services from './sections/Services.jsx';
+import Process from './sections/Process.jsx';
+import Skills from './sections/Skills.jsx';
 import Contact from './sections/Contact.jsx';
-
-// Three.js is the heaviest part of the page, so it loads on its own after the first paint.
-const Scene = lazy(() => import('./three/Scene.jsx'));
-
-// If WebGL is unavailable the page still works; the gradient backdrop stands in for the 3D stage.
-class StageBoundary extends Component {
-  state = { failed: false };
-  static getDerivedStateFromError() {
-    return { failed: true };
-  }
-  render() {
-    return this.state.failed ? null : this.props.children;
-  }
-}
 
 function ScrollProgress() {
   const { scrollYProgress } = useScroll();
   const scaleX = useSpring(scrollYProgress, { stiffness: 140, damping: 30, restDelta: 0.001 });
-  return <motion.div className="fixed inset-x-0 top-0 z-[100] h-0.5 origin-left bg-gradient-to-r from-teal to-sodium" style={{ scaleX }} aria-hidden="true" />;
+  return <motion.div className="fixed inset-x-0 top-0 z-[100] h-[2px] origin-left bg-gradient-to-r from-teal via-sodium to-[#ff5e7a]" style={{ scaleX }} aria-hidden="true" />;
 }
 
 export default function App() {
@@ -77,38 +64,22 @@ export default function App() {
   return (
     <MotionConfig reducedMotion="user">
       <Preloader onDone={onDone} />
-
-      {/* Stage: the 3D scene, then a fixed film grain and a vignette, all behind the page. The wrapper is the
-          large viewport height so the canvas is not resized while a phone's address bar slides away. */}
-      <div className="pointer-events-none fixed inset-x-0 top-0 z-0 h-lvh bg-ink" aria-hidden="true">
-        <StageBoundary>
-          <Suspense fallback={null}>
-            <motion.div className="absolute inset-0" initial={{ opacity: 0 }} animate={{ opacity: ready ? 1 : 0 }} transition={{ duration: 2.4, delay: 0.2 }}>
-              <Scene />
-            </motion.div>
-          </Suspense>
-        </StageBoundary>
-        <div className="grain absolute inset-0 opacity-[0.045]" />
-        <div className="absolute inset-0 bg-[radial-gradient(130%_95%_at_50%_42%,transparent_45%,rgb(0_0_0/0.72)_100%)]" />
-      </div>
+      <Backdrop />
 
       <div id="page" className="relative z-[2]">
-        <a
-          href="#main"
-          className="absolute left-[-9999px] top-2 z-[300] bg-sodium px-4 py-2 font-semibold text-ink no-underline focus:left-4"
-        >
+        <a href="#main" className="absolute left-[-9999px] top-2 z-[300] rounded-full bg-sodium px-4 py-2 font-medium text-ink no-underline focus:left-4">
           Skip to content
         </a>
         <ScrollProgress />
         <Nav ready={ready} />
         <main id="main" className="overflow-x-clip">
           <Hero ready={ready} />
-          <Marquee />
+          <LogoMarquee />
           <About />
-          <Services />
-          <Stack />
           <Work onOpen={open} />
-          <Journey />
+          <Services />
+          <Process />
+          <Skills />
           <Contact />
         </main>
       </div>

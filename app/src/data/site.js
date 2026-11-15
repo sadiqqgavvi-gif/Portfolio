@@ -13,26 +13,14 @@ export const site = {
 
 export const nav = [
   { id: 'about', label: 'About' },
-  { id: 'services', label: 'Services' },
-  { id: 'stack', label: 'Stack' },
   { id: 'work', label: 'Work' },
-  { id: 'journey', label: 'Journey' },
+  { id: 'services', label: 'Services' },
+  { id: 'process', label: 'Process' },
+  { id: 'skills', label: 'Skills' },
   { id: 'contact', label: 'Contact' }
 ];
 
-export const roles = ['MERN web apps', 'real-time chat systems', 'AI-powered tools', '3D web experiences', 'Chrome extensions'];
-
-export const marquee = {
-  tech: ['React.js', 'Node.js', 'Express.js', 'MongoDB', 'Socket.io', 'Three.js', 'Tailwind CSS', 'OpenAI API', 'Docker', 'GitHub Actions'],
-  traits: ['Full stack', 'Real-time', 'AI-assisted', 'Secure by default', 'Built & deployed', 'Clean structure']
-};
-
-export const stats = [
-  { to: 4, label: 'Projects built end to end, from an AI interview coach to a Chrome extension.' },
-  { to: 30000, suffix: '+', separator: ',', label: 'Interview questions served by SmartHire, my final year project.' },
-  { to: 5, label: 'AI tools in my daily workflow, alongside VS Code and Antigravity.' },
-  { from: 2022, to: 2026, label: 'Graduated with a BS in Software Engineering.' }
-];
+export const roles = ['real-time', 'AI-powered', 'full stack', 'secure', '3D'];
 
 export const services = [
   {
@@ -73,43 +61,51 @@ export const services = [
   }
 ];
 
-// Listed top to bottom the way a request travels through the stack. `layer` matches a slab in the 3D scene.
-export const mern = [
-  { letter: 'M', name: 'MongoDB', role: 'Stores the data, modeled with Mongoose', layer: 3 },
-  { letter: 'E', name: 'Express.js', role: 'Routes and secures the API', layer: 1 },
-  { letter: 'R', name: 'React.js', role: 'Builds the interface', layer: 0 },
-  { letter: 'N', name: 'Node.js', role: 'Runs the server', layer: 2 }
+export const proof = [
+  { value: '4', label: 'full stack builds' },
+  { value: '3', label: 'live demos' },
+  { value: '30k+', label: 'questions served' },
+  { value: '2026', label: 'BS Software Eng.' }
 ];
 
-export const skills = [
-  { title: 'Frontend', items: ['React.js', 'HTML5', 'CSS3', 'Tailwind CSS', 'Three.js', 'GSAP', 'Responsive design'] },
-  { title: 'Backend', items: ['Node.js', 'Express.js', 'REST APIs'] },
-  { title: 'Database', items: ['MongoDB (Mongoose)', 'MySQL'] },
-  { title: 'AI development tools', items: ['ChatGPT', 'Claude', 'Codex', 'Google Antigravity', 'Gemini'], accent: true },
-  { title: 'Authentication & security', items: ['JWT', 'Google OAuth', 'bcrypt', 'Helmet', 'CORS', 'Rate limiting'] },
-  { title: 'Real-time & integrations', items: ['Socket.io', 'WebRTC', 'Server-Sent Events', 'OpenAI API', 'Web Speech API'] },
-  { title: 'Tools & DevOps', items: ['VS Code', 'Git', 'GitHub Actions', 'Docker', 'Netlify', 'Vercel'] },
-  { title: 'Core concepts', items: ['AI-assisted development', 'Project structure', 'OOP', 'Component architecture', 'CRUD'] }
-];
-
-export const journey = [
+export const process = [
   {
-    years: '2022 – 26',
-    status: 'Graduated',
-    title: 'BS Software Engineering',
-    place: 'PMAS Arid Agriculture University, Rawalpindi',
-    note: 'Final year project: SmartHire, an AI-powered interview preparation platform.'
+    title: 'Understand & plan',
+    text: 'I break a feature into screens, data and endpoints before writing code: the Mongoose schema, the API contract and the edge cases. ChatGPT and Claude help me pressure-test the plan.',
+    points: ['Data model first', 'API contract', 'Edge cases listed'],
+    code: ['POST /api/orders', '  body  { items, type, table }', '  201   { id, status: "pending" }']
   },
   {
-    years: '2020 – 22',
-    status: 'Completed',
-    title: 'Intermediate in Computer Science (ICS)',
-    place: 'Degree College, Jhelum'
+    title: 'Build',
+    text: 'React components on the front, Express routes and middleware behind them, in a folder structure someone else can find their way around. AI pair programming in VS Code and Antigravity speeds up the boring parts.',
+    points: ['Reusable components', 'Validation middleware', 'Clean structure'],
+    code: ["router.patch('/:id/status',", '  requireStaff, validate(status),', '  updateStatus)']
   },
   {
-    years: '2018 – 20',
-    status: 'Completed',
-    title: 'Matriculation, Computer Science',
-    place: 'M.A Jinnah Grammar High School'
+    title: 'Test & secure',
+    text: 'Unit and API tests for the logic that matters, then hardening: bcrypt, short-lived JWTs, Helmet, a strict CORS list and rate limits. I check accessibility and Lighthouse scores before calling it done.',
+    points: ['Unit & API tests', 'Auth & rate limits', 'Accessibility checks'],
+    code: ['$ npm test', '$ npx lighthouse <url>', '$ npx axe <url>']
+  },
+  {
+    title: 'Ship & iterate',
+    text: 'Docker images and a GitHub Actions pipeline that tests every push, then deploys to Netlify or Vercel. A clear README so the next developer can run it in minutes.',
+    points: ['CI on every push', 'Docker', 'Docs & README'],
+    code: ['$ git push origin main', '  ✓ CI  tests passed', '  ✓ deployed to production']
   }
+];
+
+// Brand icons come from simple-icons by key; entries without one use a plain monogram.
+export const skillGroups = [
+  { title: 'Frontend', items: [['React', 'siReact'], ['JavaScript', 'siJavascript'], ['HTML5', 'siHtml5'], ['CSS', 'siCss'], ['Tailwind CSS', 'siTailwindcss'], ['Vite', 'siVite'], ['Three.js', 'siThreedotjs'], ['GSAP', 'siGreensock']] },
+  { title: 'Backend', items: [['Node.js', 'siNodedotjs'], ['Express', 'siExpress'], ['REST APIs', null], ['Socket.io', 'siSocketdotio'], ['WebRTC', 'siWebrtc']] },
+  { title: 'Data & auth', items: [['MongoDB', 'siMongodb'], ['Mongoose', 'siMongoose'], ['MySQL', 'siMysql'], ['JWT', 'siJsonwebtokens'], ['Google OAuth', 'siGoogle']] },
+  { title: 'DevOps', items: [['Git', 'siGit'], ['GitHub', 'siGithub'], ['GitHub Actions', 'siGithubactions'], ['Docker', 'siDocker'], ['Netlify', 'siNetlify'], ['Vercel', 'siVercel']] },
+  { title: 'AI tools', items: [['ChatGPT', null], ['Claude', 'siClaude'], ['Gemini', 'siGooglegemini'], ['Codex', null], ['Antigravity', null]] }
+];
+
+export const marqueeLogos = [
+  ['React', 'siReact'], ['Node.js', 'siNodedotjs'], ['Express', 'siExpress'], ['MongoDB', 'siMongodb'], ['Tailwind CSS', 'siTailwindcss'],
+  ['Socket.io', 'siSocketdotio'], ['Three.js', 'siThreedotjs'], ['Docker', 'siDocker'], ['GitHub Actions', 'siGithubactions'],
+  ['Vite', 'siVite'], ['JavaScript', 'siJavascript'], ['WebRTC', 'siWebrtc'], ['Vercel', 'siVercel'], ['Netlify', 'siNetlify'], ['GSAP', 'siGreensock']
 ];

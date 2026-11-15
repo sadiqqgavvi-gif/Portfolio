@@ -5,35 +5,33 @@ import { useMediaQuery } from '../lib/hooks.js';
 import SectionHead from '../components/SectionHead.jsx';
 import Tilt from '../components/Tilt.jsx';
 import { ServiceIcon } from '../components/Icons.jsx';
+import SpotCard from '../components/SpotCard.jsx';
 
 function Face({ service, index }) {
   return (
-    <Tilt className="group h-full rounded-[clamp(16px,2vw,24px)]">
-      <div className="relative flex h-full flex-col overflow-hidden rounded-[inherit] panel border p-[clamp(14px,2.2vw,28px)] transition-colors duration-500 group-hover:border-sodium/60 preserve-3d">
-        <span
-          className="pointer-events-none absolute -right-16 -top-16 size-56 bg-[radial-gradient(closest-side,rgb(255_154_77/0.18),transparent)] opacity-0 transition-opacity duration-700 group-hover:opacity-100"
-          aria-hidden="true"
-        />
+    <Tilt className="group h-full rounded-[clamp(16px,2vw,22px)]" max={7}>
+      <SpotCard className="flex h-full flex-col overflow-hidden rounded-[inherit] p-[clamp(14px,2.2vw,28px)] preserve-3d">
         <div className="flex items-start justify-between" style={{ transform: 'translateZ(36px)' }}>
-          <span className="grid size-[clamp(2.5rem,2rem+2vw,3.25rem)] place-items-center rounded-[clamp(10px,1.2vw,16px)] border border-line bg-ink/80 text-sodium transition-transform duration-500 group-hover:-rotate-6 group-hover:scale-110 [&>svg]:size-[55%]">
+          <span className="relative grid size-[clamp(2.5rem,2rem+2vw,3.1rem)] place-items-center rounded-[clamp(10px,1.2vw,14px)] border border-white/10 bg-gradient-to-b from-white/[0.08] to-white/[0.01] text-sodium shadow-[inset_0_1px_0_rgb(255_255_255/0.08)] transition-transform duration-500 group-hover:-rotate-6 group-hover:scale-110 [&>svg]:size-[52%]">
+            <span className="absolute inset-0 rounded-[inherit] opacity-0 shadow-[0_0_30px_-4px_rgb(255_138_61/0.8)] transition-opacity duration-500 group-hover:opacity-100" aria-hidden="true" />
             <ServiceIcon name={service.icon} />
           </span>
-          <span className="display text-[clamp(2rem,1.4rem+2.4vw,3rem)] text-outline">{String(index + 1).padStart(2, '0')}</span>
+          <span className="font-mono text-[0.72rem] text-fog">{String(index + 1).padStart(2, '0')}</span>
         </div>
-        <h3 className="display mt-[clamp(14px,3vw,36px)] text-[clamp(1.35rem,0.9rem+2.2vw,2.1rem)]" style={{ transform: 'translateZ(48px)' }}>
+        <h3 className="display mt-[clamp(16px,3vw,40px)] text-[clamp(1.15rem,0.85rem+1.4vw,1.75rem)] tracking-[-0.035em]" style={{ transform: 'translateZ(48px)' }}>
           {service.title}
         </h3>
-        <p className="mt-[clamp(6px,1vw,12px)] text-[clamp(0.78rem,0.68rem+0.5vw,0.96rem)] leading-[1.45] text-bone/70 sm:leading-relaxed" style={{ transform: 'translateZ(24px)' }}>
+        <p className="mt-[clamp(6px,1vw,10px)] text-[clamp(0.78rem,0.7rem+0.4vw,0.95rem)] leading-[1.5] text-fog" style={{ transform: 'translateZ(24px)' }}>
           {service.text}
         </p>
-        <ul className="m-0 mt-auto flex list-none flex-wrap gap-1 p-0 pt-[clamp(12px,2.4vw,28px)] sm:gap-1.5" style={{ transform: 'translateZ(30px)' }}>
+        <ul className="m-0 mt-auto flex list-none flex-wrap gap-1 p-0 pt-[clamp(12px,2.4vw,26px)] sm:gap-1.5" style={{ transform: 'translateZ(30px)' }}>
           {service.tags.map(tag => (
-            <li key={tag} className="rounded-full border border-line px-2 py-0.5 font-mono text-[0.58rem] uppercase tracking-wider text-fog sm:px-2.5 sm:py-1 sm:text-[0.68rem]">
+            <li key={tag} className="rounded-full border border-white/[0.08] bg-white/[0.03] px-2 py-0.5 text-[0.62rem] text-bone/75 sm:px-2.5 sm:py-1 sm:text-[0.74rem]">
               {tag}
             </li>
           ))}
         </ul>
-      </div>
+      </SpotCard>
     </Tilt>
   );
 }
@@ -41,18 +39,16 @@ function Face({ service, index }) {
 function Back({ index }) {
   return (
     <div
-      className="absolute inset-0 flex flex-col items-center justify-center gap-2 rounded-[clamp(16px,2vw,24px)] border border-sodium/40 bg-ink-3 [backface-visibility:hidden]"
-      style={{
-        transform: 'rotateY(180deg)',
-        backgroundImage:
-          'repeating-linear-gradient(45deg, rgb(255 154 77 / 0.07) 0 2px, transparent 2px 14px), repeating-linear-gradient(-45deg, rgb(95 211 199 / 0.06) 0 2px, transparent 2px 14px)'
-      }}
+      className="absolute inset-0 flex flex-col items-center justify-center gap-2 overflow-hidden rounded-[clamp(16px,2vw,22px)] border border-white/10 bg-ink-2 [backface-visibility:hidden]"
+      style={{ transform: 'rotateY(180deg)' }}
       aria-hidden="true"
     >
-      <b className="display text-[clamp(2.4rem,1.6rem+3vw,3.75rem)]">
+      <span className="dot-grid absolute inset-0 opacity-60" />
+      <span className="absolute inset-0 bg-[radial-gradient(circle_at_50%_40%,rgb(255_138_61/0.18),transparent_60%)]" />
+      <b className="relative text-[clamp(2rem,1.4rem+2.6vw,3.2rem)] font-semibold tracking-[-0.05em]">
         GS<i className="not-italic text-sodium">.</i>
       </b>
-      <span className="eyebrow">{String(index + 1).padStart(2, '0')} · What I do</span>
+      <span className="eyebrow relative">{String(index + 1).padStart(2, '0')} / 06</span>
     </div>
   );
 }
@@ -107,10 +103,11 @@ export default function Services() {
     <section id="services" className="relative py-[clamp(80px,13vh,160px)]">
       <div className="wrap">
         <SectionHead
-          index="02"
-          label="What I do"
-          title="Full features, front to back"
-          sub="I take a feature from the first screen to the database and out to production."
+          index="03"
+          label="Services"
+          title="What I can do"
+          accent="for your team."
+          sub="I take a feature from the first screen to the database and out to production. Scroll to deal the cards."
         />
         <Dealt key={wide ? 3 : 2} columns={wide ? 3 : 2} />
       </div>

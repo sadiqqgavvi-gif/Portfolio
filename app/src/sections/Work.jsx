@@ -1,10 +1,9 @@
-import { useEffect, useRef } from 'react';
-import { motion, useMotionValue, useMotionValueEvent, useReducedMotion, useScroll, useSpring, useTransform } from 'motion/react';
+import { useRef } from 'react';
+import { motion, useMotionValue, useReducedMotion, useScroll, useSpring, useTransform } from 'motion/react';
 import { ArrowUpRight, Maximize2 } from 'lucide-react';
 import { projects } from '../data/projects.js';
 import { site } from '../data/site.js';
 import { useMediaQuery } from '../lib/hooks.js';
-import { sceneState } from '../lib/scene-state.js';
 import SectionHead from '../components/SectionHead.jsx';
 import Reveal from '../components/Reveal.jsx';
 import Button from '../components/Button.jsx';
@@ -108,34 +107,35 @@ function ProjectCard({ project, index, enter, onOpen, pinned = false, className 
   return (
     <article
       aria-labelledby={`project-${project.id}`}
-      className={`relative grid grid-cols-[minmax(0,1fr)] grid-rows-[minmax(0,1fr)_auto] overflow-hidden rounded-[clamp(20px,2.4vw,36px)] border border-white/14 bg-[#07141b] lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] lg:grid-rows-1 ${className}`}
+      className={`relative grid grid-cols-[minmax(0,1fr)] grid-rows-[minmax(0,1fr)_auto] overflow-hidden rounded-[clamp(20px,2.4vw,36px)] border border-white/[0.09] bg-[#0b0c0f] shadow-[0_40px_120px_-40px_rgb(0_0_0/0.9)] lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] lg:grid-rows-1 ${className}`}
       style={{
         '--accent': project.accent,
-        backgroundImage: `radial-gradient(90% 120% at 100% 0%, color-mix(in srgb, ${project.accent} 26%, transparent), transparent 62%), radial-gradient(60% 80% at 0% 100%, color-mix(in srgb, ${project.accent} 12%, transparent), transparent 70%)`
+        backgroundImage: `radial-gradient(80% 110% at 100% 0%, color-mix(in srgb, ${project.accent} 22%, transparent), transparent 60%), radial-gradient(60% 80% at 0% 100%, color-mix(in srgb, ${project.accent} 8%, transparent), transparent 70%)`
       }}
     >
       <div className="relative z-10 order-2 flex flex-col p-[clamp(16px,3vw,44px)] max-lg:pt-1 lg:order-1">
         <div className="flex items-center justify-between gap-4">
-          <span className="truncate rounded-full border px-3 py-1.5 font-mono text-[clamp(0.58rem,0.5rem+0.4vw,0.68rem)] uppercase tracking-wider sm:tracking-widest" style={{ borderColor: `${project.accent}66`, color: project.accent }}>
+          <span className="inline-flex items-center gap-2 truncate rounded-full border px-3 py-1.5 text-[clamp(0.66rem,0.6rem+0.3vw,0.76rem)] font-medium" style={{ borderColor: `${project.accent}55`, color: project.accent, background: `${project.accent}12` }}>
+            <span className="size-1.5 rounded-full" style={{ background: project.accent, boxShadow: `0 0 10px ${project.accent}` }} aria-hidden="true" />
             {project.tag}
           </span>
-          <span className="shrink-0 whitespace-nowrap font-mono text-xs tracking-widest text-fog" aria-hidden="true">
+          <span className="shrink-0 whitespace-nowrap font-mono text-[0.72rem] text-fog" aria-hidden="true">
             {pad(index + 1)} / {pad(projects.length)}
           </span>
         </div>
 
-        <h3 id={`project-${project.id}`} className="display mt-[clamp(10px,2.4vh,30px)] text-[clamp(2.7rem,1.6rem+5vw,6.4rem)] leading-[0.84]">
+        <h3 id={`project-${project.id}`} className="display text-gradient mt-[clamp(10px,2.4vh,28px)] text-[clamp(2.4rem,1.3rem+3.8vw,4.8rem)] leading-[0.95]">
           {project.name}
         </h3>
-        <p className="eyebrow mt-2 max-lg:text-[0.66rem]">{project.kind}</p>
-        <p className="mt-[clamp(8px,1.8vh,20px)] max-w-[34em] text-[clamp(0.88rem,0.84rem+0.3vw,0.98rem)] leading-relaxed text-bone/85 max-lg:line-clamp-4 max-lg:leading-snug max-lg:[@media(max-height:720px)]:line-clamp-2">{project.lede}</p>
+        <p className="serif mt-1.5 text-[clamp(1.1rem,1rem+0.5vw,1.4rem)] text-bone/70">{project.kind}</p>
+        <p className="mt-[clamp(8px,1.8vh,20px)] max-w-[34em] text-[clamp(0.88rem,0.84rem+0.3vw,0.98rem)] leading-relaxed text-fog max-lg:line-clamp-4 max-lg:leading-snug max-lg:[@media(max-height:720px)]:line-clamp-2">{project.lede}</p>
 
         <dl className="m-0 mt-[clamp(10px,2.2vh,26px)] grid grid-cols-3 gap-3 border-y border-line py-[clamp(8px,1.4vh,14px)] max-lg:[@media(max-height:620px)]:hidden">
           {project.highlights.map(item => (
             <div key={item.label} className="min-w-0">
               <dt className="sr-only">{item.label}</dt>
               <dd className="m-0">
-                <b className="display block text-[clamp(1.5rem,1.1rem+1.2vw,2.3rem)] leading-none" style={{ color: project.accent }}>
+                <b className="display block text-[clamp(1.35rem,1rem+1.1vw,2rem)] leading-none" style={{ color: project.accent }}>
                   {item.value}
                 </b>
                 <span className="mt-1 block text-[0.74rem] leading-snug text-fog">{item.label}</span>
@@ -146,12 +146,12 @@ function ProjectCard({ project, index, enter, onOpen, pinned = false, className 
 
         <ul className="m-0 mt-[clamp(12px,2vh,22px)] flex list-none flex-wrap gap-1.5 p-0 max-lg:[@media(max-height:900px)]:hidden">
           {shown.map(chip => (
-            <li key={chip} className="rounded-full border border-line bg-ink/40 px-2.5 py-1 font-mono text-[0.68rem] tracking-wide text-bone/80">
+            <li key={chip} className="rounded-full border border-white/[0.08] bg-white/[0.03] px-2.5 py-1 text-[0.74rem] text-bone/80">
               {chip}
             </li>
           ))}
           {project.chips.length > shown.length && (
-            <li className="rounded-full px-1.5 py-1 font-mono text-[0.68rem] text-fog">+{project.chips.length - shown.length} more</li>
+            <li className="rounded-full px-1.5 py-1 text-[0.74rem] text-fog">+{project.chips.length - shown.length} more</li>
           )}
         </ul>
 
@@ -221,18 +221,6 @@ function StickyStack({ onOpen }) {
   // 0 → 1 while the first card rises into view, then +1 for every further card that reaches the top.
   const travel = useTransform([arriving, stacking], ([a, s]) => a + s * (count - 1));
 
-  // The backdrop behind the page takes the colour of whichever project is on top of the stack.
-  useMotionValueEvent(travel, 'change', value => {
-    const top = Math.min(count - 1, Math.max(0, Math.floor(value - 0.55)));
-    sceneState.accent = value > 0.15 ? projects[top].accent : null;
-  });
-  useEffect(
-    () => () => {
-      sceneState.accent = null;
-    },
-    []
-  );
-
   return (
     <div ref={ref} className="wrap relative mt-[clamp(20px,4vh,48px)]">
       {projects.map((project, index) => (
@@ -268,10 +256,11 @@ export default function Work({ onOpen }) {
     <section id="work" className="relative pt-[clamp(80px,13vh,160px)]">
       <div className="wrap">
         <SectionHead
-          index="04"
+          index="02"
           label="Selected work"
-          title="Selected work"
-          sub="Four full builds, each designed, coded and deployed end to end. Open a case study for the features, the architecture and every screen."
+          title="Things I’ve built"
+          accent="and shipped."
+          sub="Four full builds, each designed, coded and deployed end to end. Open a case study for the problem, the hard parts, the architecture and every screen."
         />
       </div>
 
@@ -286,7 +275,7 @@ export default function Work({ onOpen }) {
       )}
 
       <Reveal className="wrap mt-[clamp(40px,8vh,90px)] flex flex-wrap items-center justify-between gap-5 border-t border-line pt-8">
-        <p className="display m-0 text-[clamp(1.8rem,1.2rem+2.4vw,3.2rem)]">More on GitHub</p>
+        <p className="display m-0 text-[clamp(1.6rem,1.1rem+2vw,2.8rem)]">More on <span className="serif text-accent-gradient">GitHub</span></p>
         <Button href={site.github} external>
           <GitHubIcon width="16" height="16" /> github.com/{site.githubHandle} <ArrowUpRight size={15} strokeWidth={2.2} aria-hidden="true" />
         </Button>

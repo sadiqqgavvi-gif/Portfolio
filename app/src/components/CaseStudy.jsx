@@ -5,7 +5,6 @@ import { ArrowRight, ArrowUpRight, X } from 'lucide-react';
 import { projects } from '../data/projects.js';
 import { useKey } from '../lib/hooks.js';
 import { lockScroll, unlockScroll } from '../lib/scroll.js';
-import { sceneState } from '../lib/scene-state.js';
 import Button from './Button.jsx';
 import Lightbox from './Lightbox.jsx';
 import { BrowserFrame, Shot } from './Frames.jsx';
@@ -41,12 +40,10 @@ export default function CaseStudy({ projectId, onClose, onNavigate }) {
     const previous = document.activeElement;
     const page = document.getElementById('page');
     lockScroll();
-    sceneState.paused = true;
     if (page) page.inert = true;
     closeButton.current?.focus({ preventScroll: true });
     return () => {
       unlockScroll();
-      sceneState.paused = false;
       if (page) page.inert = false;
       previous?.focus?.({ preventScroll: true });
     };
@@ -74,18 +71,18 @@ export default function CaseStudy({ projectId, onClose, onNavigate }) {
         onClick={onClose}
       />
       <motion.div
-        className="absolute inset-x-0 bottom-0 top-2 mx-auto flex max-w-[1560px] flex-col overflow-hidden rounded-t-[clamp(18px,2.4vw,32px)] border border-b-0 border-white/12 bg-[#081319] shadow-[0_-30px_120px_rgb(0_0_0/0.7)] sm:top-4 xl:inset-x-4"
+        className="absolute inset-x-0 bottom-0 top-2 mx-auto flex max-w-[1560px] flex-col overflow-hidden rounded-t-[clamp(18px,2.4vw,32px)] border border-b-0 border-white/12 bg-[#0b0c0f] shadow-[0_-30px_120px_rgb(0_0_0/0.7)] sm:top-4 xl:inset-x-4"
         initial={{ y: '100%' }}
         animate={{ y: 0 }}
         exit={{ y: '100%' }}
         transition={{ duration: 0.85, ease: [0.32, 0.72, 0, 1] }}
       >
-        <header className="relative z-10 flex shrink-0 items-center justify-between gap-3 border-b border-line bg-[#081319]/90 px-[clamp(14px,3vw,36px)] py-3 backdrop-blur-md">
+        <header className="relative z-10 flex shrink-0 items-center justify-between gap-3 border-b border-line bg-[#0b0c0f]/90 px-[clamp(14px,3vw,36px)] py-3 backdrop-blur-md">
           <p className="m-0 flex min-w-0 items-baseline gap-3">
             <span className="font-mono text-xs tracking-widest" style={{ color: project.accent }}>
               {pad(index + 1)} / {pad(projects.length)}
             </span>
-            <span className="display truncate text-2xl">{project.name}</span>
+            <span className="truncate text-[1.15rem] font-semibold tracking-[-0.03em]">{project.name}</span>
           </p>
           <div className="flex shrink-0 items-center gap-2">
             {project.live && (
@@ -126,7 +123,7 @@ export default function CaseStudy({ projectId, onClose, onNavigate }) {
                 <span className="inline-block rounded-full border px-3 py-1.5 font-mono text-[0.68rem] uppercase tracking-widest" style={{ borderColor: `${project.accent}66`, color: project.accent }}>
                   {project.tag}
                 </span>
-                <h2 className="display mt-5 flex flex-wrap overflow-hidden pb-[0.05em] pt-[0.08em] text-[clamp(3.6rem,1.4rem+11vw,12rem)] leading-[0.82]" aria-label={project.name}>
+                <h2 className="display text-gradient mt-5 flex flex-wrap overflow-hidden pb-[0.08em] pt-[0.04em] text-[clamp(3.2rem,1.4rem+7vw,8.5rem)] leading-[0.92]" aria-label={project.name}>
                   {[...project.name].map((char, i) => (
                     <motion.span
                       key={i}
@@ -140,7 +137,7 @@ export default function CaseStudy({ projectId, onClose, onNavigate }) {
                     </motion.span>
                   ))}
                 </h2>
-                <p className="eyebrow mt-3">{project.kind}</p>
+                <p className="serif mt-2 text-[clamp(1.3rem,1.1rem+0.8vw,1.9rem)] text-bone/70">{project.kind}</p>
                 <p className="mt-6 max-w-3xl text-[clamp(1.1rem,1rem+0.7vw,1.5rem)] leading-snug text-bone/90">{project.lede}</p>
                 <div className="mt-6 flex flex-wrap gap-2.5 sm:hidden">
                   {project.live && (
@@ -183,7 +180,7 @@ export default function CaseStudy({ projectId, onClose, onNavigate }) {
                           style={{ transformPerspective: 900, transformOrigin: '50% 100%' }}
                         >
                           <span className="font-mono text-[0.68rem] tracking-widest text-fog">{pad(i + 1)}</span>
-                          <b className="display mt-2 block text-2xl">{feature.title}</b>
+                          <b className="mt-2 block text-[1.15rem] font-semibold tracking-[-0.02em]">{feature.title}</b>
                           <span className="mt-2 block text-[0.95rem] leading-relaxed text-fog">{feature.text}</span>
                           <span className="absolute inset-x-0 bottom-0 h-px origin-left scale-x-0 transition-transform duration-700 ease-out group-hover:scale-x-100" style={{ background: project.accent }} aria-hidden="true" />
                         </motion.li>
@@ -211,6 +208,38 @@ export default function CaseStudy({ projectId, onClose, onNavigate }) {
                 </aside>
               </div>
 
+              {/* Challenges */}
+              <div className="px-[clamp(16px,4vw,64px)] pb-[clamp(48px,9vh,110px)]">
+                <Block label="Challenges">
+                  <h3 className="display mt-3 text-[clamp(2rem,1.3rem+2.8vw,3.8rem)]">
+                    The hard parts, <span className="serif text-accent-gradient">and how I solved them.</span>
+                  </h3>
+                </Block>
+                <ol className="m-0 mt-9 grid list-none gap-3 p-0 lg:grid-cols-3">
+                  {project.challenges.map((item, i) => (
+                    <motion.li
+                      key={item.title}
+                      className="relative flex flex-col overflow-hidden rounded-2xl border border-line bg-white/[0.02] p-6"
+                      initial={{ opacity: 0, y: 36 }}
+                      whileInView={{ opacity: 1, y: 0 }}
+                      viewport={view}
+                      transition={{ duration: 0.9, ease, delay: i * 0.1 }}
+                    >
+                      <span className="font-mono text-[0.72rem]" style={{ color: project.accent }}>
+                        {pad(i + 1)}
+                      </span>
+                      <b className="mt-3 block text-[1.15rem] font-semibold leading-snug tracking-[-0.02em]">{item.title}</b>
+                      <p className="m-0 mt-4 text-[0.78rem] uppercase tracking-[0.12em] text-fog">Problem</p>
+                      <p className="m-0 mt-1.5 text-[0.93rem] leading-relaxed text-bone/80">{item.problem}</p>
+                      <p className="m-0 mt-4 text-[0.78rem] uppercase tracking-[0.12em]" style={{ color: project.accent }}>
+                        Solution
+                      </p>
+                      <p className="m-0 mt-1.5 text-[0.93rem] leading-relaxed text-bone/90">{item.solution}</p>
+                    </motion.li>
+                  ))}
+                </ol>
+              </div>
+
               {/* Under the hood */}
               <div className="border-y border-line bg-ink/50 px-[clamp(16px,4vw,64px)] py-[clamp(44px,8vh,96px)]">
                 <Block label="Under the hood">
@@ -220,7 +249,7 @@ export default function CaseStudy({ projectId, onClose, onNavigate }) {
                   {project.flow.steps.map(([kicker, title, text], i) => (
                     <motion.li
                       key={title}
-                      className="relative rounded-2xl border border-line bg-[#081319] p-5"
+                      className="relative rounded-2xl border border-line bg-[#0b0c0f] p-5"
                       initial={{ opacity: 0, y: 30 }}
                       whileInView={{ opacity: 1, y: 0 }}
                       viewport={view}
@@ -238,12 +267,12 @@ export default function CaseStudy({ projectId, onClose, onNavigate }) {
                       <small className="font-mono text-[0.68rem] uppercase tracking-widest" style={{ color: project.accent }}>
                         {pad(i + 1)} · {kicker}
                       </small>
-                      <b className="display mt-2 block text-[1.7rem] leading-none">{title}</b>
+                      <b className="mt-2 block text-[1.2rem] font-semibold leading-tight tracking-[-0.02em]">{title}</b>
                       <span className="mt-2.5 block text-[0.9rem] leading-relaxed text-fog">{text}</span>
                       {i < project.flow.steps.length - 1 && (
                         <ArrowRight
                           size={16}
-                          className="absolute -bottom-2.5 left-1/2 z-10 -translate-x-1/2 rotate-90 rounded-full bg-[#081319] text-fog lg:-right-2.5 lg:bottom-auto lg:left-auto lg:top-1/2 lg:-translate-y-1/2 lg:translate-x-0 lg:rotate-0"
+                          className="absolute -bottom-2.5 left-1/2 z-10 -translate-x-1/2 rotate-90 rounded-full bg-[#0b0c0f] text-fog lg:-right-2.5 lg:bottom-auto lg:left-auto lg:top-1/2 lg:-translate-y-1/2 lg:translate-x-0 lg:rotate-0"
                           aria-hidden="true"
                         />
                       )}
@@ -304,7 +333,7 @@ export default function CaseStudy({ projectId, onClose, onNavigate }) {
                 <span className="absolute inset-0 origin-bottom scale-y-0 transition-transform duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:scale-y-100" style={{ background: `color-mix(in srgb, ${next.accent} 16%, transparent)` }} aria-hidden="true" />
                 <span className="eyebrow relative">Next project</span>
                 <span className="relative mt-2 flex items-center justify-between gap-6">
-                  <span className="display text-[clamp(3rem,1.6rem+7vw,8rem)] leading-[0.85]">{next.name}</span>
+                  <span className="display text-gradient text-[clamp(2.8rem,1.4rem+6vw,7rem)] leading-[0.9]">{next.name}</span>
                   <ArrowRight className="size-[clamp(2rem,5vw,4.5rem)] shrink-0 transition-transform duration-700 group-hover:translate-x-3" style={{ color: next.accent }} aria-hidden="true" />
                 </span>
               </button>
