@@ -52,9 +52,9 @@ export default function Hero({ ready }) {
   });
 
   return (
-    <section id="top" ref={ref} className="relative flex min-h-svh flex-col justify-end pb-[clamp(28px,6vh,64px)] pt-[calc(var(--nav-h)+24px)]">
+    <section id="top" ref={ref} className="relative flex min-h-svh flex-col justify-end pb-[clamp(28px,6vh,64px)] pt-[calc(var(--nav-h)+24px)] portrait:pt-[calc(var(--nav-h)+30svh)]">
       <motion.div className="wrap" style={{ y, opacity }}>
-        <motion.p className="eyebrow !text-teal" {...fade(0.15, 12)}>
+        <motion.p data-stage-edge="hero" className="eyebrow !text-teal" {...fade(0.15, 12)}>
           {ready ? <DecryptedText text="// Full stack web developer · MERN" animateOn="view" sequential speed={28} /> : ' '}
         </motion.p>
 
@@ -78,7 +78,7 @@ export default function Hero({ ready }) {
             rotationInterval={2800}
             mainClassName="font-semibold"
           />
-          <span className="basis-full text-fog">and use AI tools to ship them faster.</span>
+          <span className="basis-full text-bone/70">and use AI tools to ship them faster.</span>
         </motion.div>
 
         <motion.div className="mt-8 flex flex-wrap items-end justify-between gap-x-10 gap-y-7" {...fade(0.9)}>
@@ -90,7 +90,7 @@ export default function Hero({ ready }) {
               Download résumé <ArrowUpRight size={16} strokeWidth={2.2} aria-hidden="true" />
             </Button>
           </div>
-          <ul className="m-0 flex list-none flex-wrap gap-x-7 gap-y-1.5 p-0 font-mono text-[0.76rem] uppercase tracking-[0.1em] text-fog">
+          <ul className="m-0 flex list-none flex-wrap gap-x-7 gap-y-1.5 p-0 font-mono text-[0.76rem] uppercase tracking-[0.1em] text-bone/75">
             <li className="flex items-center gap-2.5 text-bone">
               <span className="size-2 animate-pulse-dot rounded-full bg-teal" aria-hidden="true" />
               Open to remote and on-site roles

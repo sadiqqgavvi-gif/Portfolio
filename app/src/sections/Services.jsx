@@ -6,31 +6,29 @@ import SectionHead from '../components/SectionHead.jsx';
 import Tilt from '../components/Tilt.jsx';
 import { ServiceIcon } from '../components/Icons.jsx';
 
-const ease = [0.16, 1, 0.3, 1];
-
 function Face({ service, index }) {
   return (
-    <Tilt className="group h-full rounded-3xl">
-      <div className="relative flex h-full flex-col overflow-hidden rounded-3xl border border-line bg-ink-2/85 p-7 backdrop-blur-md transition-colors duration-500 group-hover:border-sodium/50 preserve-3d">
+    <Tilt className="group h-full rounded-[clamp(16px,2vw,24px)]">
+      <div className="relative flex h-full flex-col overflow-hidden rounded-[inherit] panel border p-[clamp(14px,2.2vw,28px)] transition-colors duration-500 group-hover:border-sodium/60 preserve-3d">
         <span
           className="pointer-events-none absolute -right-10 -top-12 size-44 rounded-full bg-sodium/15 opacity-0 blur-3xl transition-opacity duration-700 group-hover:opacity-100"
           aria-hidden="true"
         />
         <div className="flex items-start justify-between" style={{ transform: 'translateZ(36px)' }}>
-          <span className="grid size-13 place-items-center rounded-2xl border border-line bg-ink text-sodium transition-transform duration-500 group-hover:-rotate-6 group-hover:scale-110">
+          <span className="grid size-[clamp(2.5rem,2rem+2vw,3.25rem)] place-items-center rounded-[clamp(10px,1.2vw,16px)] border border-line bg-ink/80 text-sodium transition-transform duration-500 group-hover:-rotate-6 group-hover:scale-110 [&>svg]:size-[55%]">
             <ServiceIcon name={service.icon} />
           </span>
-          <span className="display text-5xl text-outline">{String(index + 1).padStart(2, '0')}</span>
+          <span className="display text-[clamp(2rem,1.4rem+2.4vw,3rem)] text-outline">{String(index + 1).padStart(2, '0')}</span>
         </div>
-        <h3 className="display mt-9 text-[2.1rem]" style={{ transform: 'translateZ(48px)' }}>
+        <h3 className="display mt-[clamp(14px,3vw,36px)] text-[clamp(1.35rem,0.9rem+2.2vw,2.1rem)]" style={{ transform: 'translateZ(48px)' }}>
           {service.title}
         </h3>
-        <p className="mt-3 text-[0.96rem] leading-relaxed text-fog" style={{ transform: 'translateZ(24px)' }}>
+        <p className="mt-[clamp(6px,1vw,12px)] text-[clamp(0.78rem,0.68rem+0.5vw,0.96rem)] leading-[1.45] text-bone/70 sm:leading-relaxed" style={{ transform: 'translateZ(24px)' }}>
           {service.text}
         </p>
-        <ul className="m-0 mt-auto flex list-none flex-wrap gap-1.5 p-0 pt-7" style={{ transform: 'translateZ(30px)' }}>
+        <ul className="m-0 mt-auto flex list-none flex-wrap gap-1 p-0 pt-[clamp(12px,2.4vw,28px)] sm:gap-1.5" style={{ transform: 'translateZ(30px)' }}>
           {service.tags.map(tag => (
-            <li key={tag} className="rounded-full border border-line px-2.5 py-1 font-mono text-[0.68rem] uppercase tracking-wider text-fog">
+            <li key={tag} className="rounded-full border border-line px-2 py-0.5 font-mono text-[0.58rem] uppercase tracking-wider text-fog sm:px-2.5 sm:py-1 sm:text-[0.68rem]">
               {tag}
             </li>
           ))}
@@ -43,7 +41,7 @@ function Face({ service, index }) {
 function Back({ index }) {
   return (
     <div
-      className="absolute inset-0 flex flex-col items-center justify-center gap-2 rounded-3xl border border-sodium/40 bg-ink-3 [backface-visibility:hidden]"
+      className="absolute inset-0 flex flex-col items-center justify-center gap-2 rounded-[clamp(16px,2vw,24px)] border border-sodium/40 bg-ink-3 [backface-visibility:hidden]"
       style={{
         transform: 'rotateY(180deg)',
         backgroundImage:
@@ -51,7 +49,7 @@ function Back({ index }) {
       }}
       aria-hidden="true"
     >
-      <b className="display text-6xl">
+      <b className="display text-[clamp(2.4rem,1.6rem+3vw,3.75rem)]">
         GS<i className="not-italic text-sodium">.</i>
       </b>
       <span className="eyebrow">{String(index + 1).padStart(2, '0')} · What I do</span>
@@ -59,8 +57,8 @@ function Back({ index }) {
   );
 }
 
-// On wide screens the six cards start as a face-down deck in the middle of the grid, then scrolling
-// deals each one out to its place and flips it over.
+// The six cards start as a face-down deck in the middle of the grid, then scrolling deals each one out to
+// its place and flips it over: three columns on wide screens, two compact columns on phones and tablets.
 function DealtCard({ service, index, columns, progress }) {
   const rows = Math.ceil(services.length / columns);
   const col = index % columns;
@@ -93,7 +91,7 @@ function Dealt({ columns }) {
   return (
     <ul
       ref={ref}
-      className="m-0 mt-[clamp(40px,7vh,84px)] grid list-none gap-5 p-0"
+      className="m-0 mt-[clamp(32px,7vh,84px)] grid list-none gap-[clamp(10px,1.6vw,20px)] p-0"
       style={{ gridTemplateColumns: `repeat(${columns}, minmax(0, 1fr))` }}
     >
       {services.map((service, index) => (
@@ -103,28 +101,8 @@ function Dealt({ columns }) {
   );
 }
 
-function Listed() {
-  return (
-    <ul className="m-0 mt-10 grid list-none grid-cols-1 gap-4 p-0">
-      {services.map((service, index) => (
-        <motion.li
-          key={service.title}
-          initial={{ opacity: 0, y: 70, rotateX: -32, scale: 0.94 }}
-          whileInView={{ opacity: 1, y: 0, rotateX: 0, scale: 1 }}
-          viewport={{ once: true, margin: '0px 0px -8% 0px' }}
-          transition={{ duration: 1, ease }}
-          style={{ transformPerspective: 900, transformOrigin: '50% 100%' }}
-        >
-          <Face service={service} index={index} />
-        </motion.li>
-      ))}
-    </ul>
-  );
-}
-
 export default function Services() {
   const wide = useMediaQuery('(min-width: 1100px)');
-  const medium = useMediaQuery('(min-width: 700px)');
   return (
     <section id="services" className="relative py-[clamp(80px,13vh,160px)]">
       <div className="wrap">
@@ -134,7 +112,7 @@ export default function Services() {
           title="Full features, front to back"
           sub="I take a feature from the first screen to the database and out to production."
         />
-        {medium ? <Dealt key={wide ? 3 : 2} columns={wide ? 3 : 2} /> : <Listed />}
+        <Dealt key={wide ? 3 : 2} columns={wide ? 3 : 2} />
       </div>
     </section>
   );

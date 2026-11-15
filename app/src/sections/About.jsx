@@ -26,7 +26,7 @@ export default function About() {
           React on the front. Node and Express behind it. MongoDB underneath. I plan, code and debug with ChatGPT, Claude, Codex, Google Antigravity and Gemini, then I ship it.
         </ScrollReveal>
 
-        <ul className="m-0 mt-[clamp(48px,9vh,110px)] grid list-none grid-cols-1 gap-4 p-0 sm:grid-cols-2 xl:grid-cols-4">
+        <ul className="m-0 mt-[clamp(48px,9vh,110px)] grid list-none grid-cols-2 gap-[clamp(10px,1.4vw,16px)] p-0 xl:grid-cols-4">
           {stats.map((stat, index) => (
             <motion.li
               key={stat.label}
@@ -39,13 +39,13 @@ export default function About() {
               <SpotlightCard
                 spotlightColor="#ff9a4d"
                 intensity={0.2}
-                className="h-full !rounded-2xl !p-6"
-                style={{ '--spotlight-card-surface': 'rgb(10 22 29 / 0.72)', '--spotlight-card-border': 'rgb(232 236 230 / 0.13)' }}
+                className="panel h-full !rounded-2xl !p-[clamp(16px,2vw,24px)]"
+                style={{ '--spotlight-card-surface': 'rgb(7 20 27 / 0.76)', '--spotlight-card-border': 'rgb(255 255 255 / 0.16)' }}
               >
-                <b className="display block text-[clamp(3.2rem,2rem+3.4vw,5.2rem)] leading-none text-bone">
+                <b className="display block text-[clamp(2.3rem,1.2rem+4.6vw,5.2rem)] leading-none text-bone">
                   <CountUp from={stat.from ?? 0} to={stat.to} separator={stat.separator ?? ''} suffix={stat.suffix ?? ''} duration={2.2} />
                 </b>
-                <span className="mt-4 block text-[0.95rem] leading-relaxed text-fog">{stat.label}</span>
+                <span className="mt-[clamp(8px,1.4vw,16px)] block text-[clamp(0.8rem,0.72rem+0.4vw,0.95rem)] leading-normal text-bone/70">{stat.label}</span>
               </SpotlightCard>
             </motion.li>
           ))}

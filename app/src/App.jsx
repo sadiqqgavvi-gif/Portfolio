@@ -88,8 +88,8 @@ export default function App() {
             </motion.div>
           </Suspense>
         </StageBoundary>
-        <div className="grain absolute -inset-1/2 animate-grain opacity-[0.06] mix-blend-overlay max-md:hidden" />
-        <div className="absolute inset-0 bg-[radial-gradient(120%_90%_at_50%_45%,transparent_55%,rgb(0_0_0/0.55)_100%)]" />
+        <div className="grain absolute -inset-1/2 animate-grain opacity-[0.07] mix-blend-overlay" />
+        <div className="absolute inset-0 bg-[radial-gradient(120%_90%_at_50%_45%,transparent_60%,rgb(0_0_0/0.35)_100%)]" />
       </div>
 
       <div id="page" className="relative z-[2]">

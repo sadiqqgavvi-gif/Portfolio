@@ -42,7 +42,7 @@ export default function Journey() {
                   <span className="display block text-[clamp(2.2rem,1.5rem+2.6vw,3.8rem)] leading-none">{item.years}</span>
                   <small className="eyebrow mt-2 block !text-teal">{item.status}</small>
                 </div>
-                <div className="rounded-2xl border border-line bg-ink-2/70 p-[clamp(18px,2.4vw,30px)] backdrop-blur-md transition-colors duration-500 hover:border-sodium/50">
+                <div className="panel rounded-2xl border p-[clamp(18px,2.4vw,30px)] transition-colors duration-500 hover:border-sodium/50">
                   <h3 className="display m-0 text-[clamp(1.6rem,1.2rem+1.5vw,2.5rem)] leading-[0.95]">{item.title}</h3>
                   <p className="m-0 mt-2 text-fog">{item.place}</p>
                   {item.note && <p className="m-0 mt-4 border-t border-line pt-4 text-[0.95rem] text-bone/90">{item.note}</p>}
