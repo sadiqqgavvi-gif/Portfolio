@@ -1,116 +1,140 @@
-import { useRef } from 'react';
-import { motion, useMotionValue, useReducedMotion, useScroll, useSpring, useTransform } from 'motion/react';
+import { useLayoutEffect, useRef, useState } from 'react';
+import { motion, useMotionValueEvent, useReducedMotion, useScroll, useSpring, useTransform } from 'motion/react';
 import { services } from '../data/site.js';
-import { useMediaQuery } from '../lib/hooks.js';
 import SectionHead from '../components/SectionHead.jsx';
-import Tilt from '../components/Tilt.jsx';
-import { ServiceIcon } from '../components/Icons.jsx';
 import SpotCard from '../components/SpotCard.jsx';
+import { ServiceIcon } from '../components/Icons.jsx';
+import { demos } from '../components/demos/ServiceDemos.jsx';
 
-function Face({ service, index }) {
+const ACCENTS = ['#ff8a3d', '#56d8c9', '#ff6b8b', '#5aa2ff', '#7c9bff', '#3ddc97'];
+
+function ServiceCard({ service, index }) {
+  const Demo = demos[service.icon];
+  const accent = ACCENTS[index % ACCENTS.length];
   return (
-    <Tilt className="group h-full rounded-[clamp(16px,2vw,22px)]" max={7}>
-      <SpotCard className="flex h-full flex-col overflow-hidden rounded-[inherit] p-[clamp(14px,2.2vw,28px)] preserve-3d">
-        <div className="flex items-start justify-between" style={{ transform: 'translateZ(36px)' }}>
-          <span className="relative grid size-[clamp(2.5rem,2rem+2vw,3.1rem)] place-items-center rounded-[clamp(10px,1.2vw,14px)] border border-white/10 bg-gradient-to-b from-white/[0.08] to-white/[0.01] text-sodium shadow-[inset_0_1px_0_rgb(255_255_255/0.08)] transition-transform duration-500 group-hover:-rotate-6 group-hover:scale-110 [&>svg]:size-[52%]">
-            <span className="absolute inset-0 rounded-[inherit] opacity-0 shadow-[0_0_30px_-4px_rgb(255_138_61/0.8)] transition-opacity duration-500 group-hover:opacity-100" aria-hidden="true" />
+    <SpotCard
+      color={accent}
+      className="group flex h-full w-full flex-col overflow-hidden rounded-[24px] p-[clamp(14px,1.6vw,22px)]"
+      style={{ backgroundImage: `radial-gradient(120% 70% at 50% 0%, ${accent}1f, transparent 60%)` }}
+    >
+      <div className="relative min-h-0 flex-1">
+        <span className="pointer-events-none absolute -inset-4 rounded-[inherit] opacity-0 transition-opacity duration-500 group-hover:opacity-100" style={{ background: `radial-gradient(60% 60% at 50% 40%, ${accent}22, transparent)` }} aria-hidden="true" />
+        <div className="relative h-full" aria-hidden="true">
+          <Demo />
+        </div>
+      </div>
+      <div className="shrink-0 pt-[clamp(14px,2vh,22px)]">
+        <div className="flex items-center gap-3">
+          <span className="grid size-10 place-items-center rounded-xl border border-white/10 bg-white/[0.04] [&>svg]:size-5" style={{ color: accent }}>
             <ServiceIcon name={service.icon} />
           </span>
-          <span className="font-mono text-[0.72rem] text-fog">{String(index + 1).padStart(2, '0')}</span>
+          <span className="font-mono text-[0.72rem] text-fog">{String(index + 1).padStart(2, '0')} / {String(services.length).padStart(2, '0')}</span>
         </div>
-        <h3 className="display mt-[clamp(16px,3vw,40px)] text-[clamp(1.15rem,0.85rem+1.4vw,1.75rem)] tracking-[-0.035em]" style={{ transform: 'translateZ(48px)' }}>
-          {service.title}
-        </h3>
-        <p className="mt-[clamp(6px,1vw,10px)] text-[clamp(0.78rem,0.7rem+0.4vw,0.95rem)] leading-[1.5] text-fog" style={{ transform: 'translateZ(24px)' }}>
-          {service.text}
-        </p>
-        <ul className="m-0 mt-auto flex list-none flex-wrap gap-1 p-0 pt-[clamp(12px,2.4vw,26px)] sm:gap-1.5" style={{ transform: 'translateZ(30px)' }}>
+        <h3 className="m-0 mt-3 text-[clamp(1.3rem,1.1rem+0.8vw,1.75rem)] font-semibold tracking-[-0.035em]">{service.title}</h3>
+        <p className="m-0 mt-2 text-[0.92rem] leading-relaxed text-fog">{service.text}</p>
+        <ul className="m-0 mt-4 flex list-none flex-wrap gap-1.5 p-0">
           {service.tags.map(tag => (
-            <li key={tag} className="rounded-full border border-white/[0.08] bg-white/[0.03] px-2 py-0.5 text-[0.62rem] text-bone/75 sm:px-2.5 sm:py-1 sm:text-[0.74rem]">
+            <li key={tag} className="rounded-full border border-white/[0.08] bg-white/[0.03] px-2.5 py-1 text-[0.74rem] text-bone/80">
               {tag}
             </li>
           ))}
         </ul>
-      </SpotCard>
-    </Tilt>
+      </div>
+    </SpotCard>
   );
 }
 
-function Back({ index }) {
+/* The six services ride a horizontal track while the section is pinned: scrolling down slides them left,
+   each card running a small live demo of that service. Same flow on every screen size. */
+function Track() {
+  const pin = useRef(null);
+  const rail = useRef(null);
+  const [distance, setDistance] = useState(0);
+  const [active, setActive] = useState(0);
+  const { scrollYProgress } = useScroll({ target: pin, offset: ['start start', 'end end'] });
+  const smooth = useSpring(scrollYProgress, { stiffness: 120, damping: 30, mass: 0.4 });
+  const x = useTransform(smooth, value => -value * distance);
+  const bar = useTransform(smooth, value => value);
+  useMotionValueEvent(scrollYProgress, 'change', value => setActive(Math.min(services.length - 1, Math.round(value * (services.length - 1)))));
+
+  useLayoutEffect(() => {
+    const measure = () => {
+      if (!rail.current) return;
+      setDistance(Math.max(0, rail.current.scrollWidth - rail.current.parentElement.clientWidth));
+    };
+    measure();
+    const observer = new ResizeObserver(measure);
+    observer.observe(rail.current);
+    window.addEventListener('resize', measure);
+    return () => {
+      observer.disconnect();
+      window.removeEventListener('resize', measure);
+    };
+  }, []);
+
   return (
-    <div
-      className="absolute inset-0 flex flex-col items-center justify-center gap-2 overflow-hidden rounded-[clamp(16px,2vw,22px)] border border-white/10 bg-ink-2 [backface-visibility:hidden]"
-      style={{ transform: 'rotateY(180deg)' }}
-      aria-hidden="true"
-    >
-      <span className="dot-grid absolute inset-0 opacity-60" />
-      <span className="absolute inset-0 bg-[radial-gradient(circle_at_50%_40%,rgb(255_138_61/0.18),transparent_60%)]" />
-      <b className="relative text-[clamp(2rem,1.4rem+2.6vw,3.2rem)] font-semibold tracking-[-0.05em]">
-        GS<i className="not-italic text-sodium">.</i>
-      </b>
-      <span className="eyebrow relative">{String(index + 1).padStart(2, '0')} / 06</span>
+    // The pinned stretch is as long as the sideways travel, so a scroll down moves the cards the same distance.
+    <div ref={pin} className="relative" style={{ height: `calc(100svh + ${distance}px)` }}>
+      <div className="sticky top-0 flex h-svh flex-col justify-center overflow-hidden pt-[var(--nav-h)]">
+        <div className="wrap">
+          <motion.div ref={rail} className="flex w-max gap-[clamp(12px,1.6vw,20px)] will-change-transform" style={{ x }}>
+            {services.map((service, index) => (
+              <motion.div
+                key={service.title}
+                className="h-[min(560px,calc(100svh-var(--nav-h)-120px))] w-[min(82vw,400px)] shrink-0"
+                initial={{ opacity: 0, y: 60, rotate: 2 }}
+                whileInView={{ opacity: 1, y: 0, rotate: 0 }}
+                viewport={{ once: true, margin: '0px -5% -10% 0px' }}
+                transition={{ duration: 0.9, ease: [0.16, 1, 0.3, 1], delay: Math.min(index, 3) * 0.08 }}
+              >
+                <ServiceCard service={service} index={index} />
+              </motion.div>
+            ))}
+            <div className="flex w-[min(70vw,320px)] shrink-0 flex-col justify-center pr-[var(--gutter)]">
+              <p className="display m-0 text-[clamp(1.8rem,1.3rem+1.6vw,2.6rem)]">
+                Need one of these? <span className="serif text-accent-gradient">Let’s talk.</span>
+              </p>
+              <a href="#contact" className="link-line mt-4 w-fit text-[0.95rem] text-bone no-underline">
+                Get in touch →
+              </a>
+            </div>
+          </motion.div>
+
+          <div className="mt-[clamp(16px,3vh,28px)] flex items-center gap-4" aria-hidden="true">
+            <span className="font-mono text-[0.72rem] text-sodium">{String(active + 1).padStart(2, '0')}</span>
+            <span className="relative h-px flex-1 overflow-hidden bg-white/10">
+              <motion.span className="absolute inset-0 origin-left bg-gradient-to-r from-teal via-sodium to-[#ff5e7a]" style={{ scaleX: bar }} />
+            </span>
+            <span className="font-mono text-[0.72rem] text-fog">{String(services.length).padStart(2, '0')}</span>
+            <span className="hidden text-[0.75rem] text-fog sm:inline">Scroll to explore →</span>
+          </div>
+        </div>
+      </div>
     </div>
   );
 }
 
-// The six cards start as a face-down deck in the middle of the grid, then scrolling deals each one out to
-// its place and flips it over: three columns on wide screens, two compact columns on phones and tablets.
-function DealtCard({ service, index, columns, progress }) {
-  const rows = Math.ceil(services.length / columns);
-  const col = index % columns;
-  const row = Math.floor(index / columns);
-  const range = [index * 0.07, 0.55 + index * 0.07];
-  const x = useTransform(progress, range, [`${((columns - 1) / 2 - col) * 104}%`, '0%'], { clamp: true });
-  const y = useTransform(progress, range, [`${((rows - 1) / 2 - row) * 106 + 18}%`, '0%'], { clamp: true });
-  const rotate = useTransform(progress, range, [(index - 2.5) * 5, 0], { clamp: true });
-  const rotateY = useTransform(progress, [range[0] + 0.12, range[1]], [180, 0], { clamp: true });
-  const scale = useTransform(progress, range, [0.86, 1], { clamp: true });
-
+// Reduced motion: the same cards in a plain grid.
+function Grid() {
   return (
-    <motion.li className="relative will-change-transform" style={{ x, y, rotate, scale, zIndex: services.length - index, transformPerspective: 1400 }}>
-      <motion.div className="relative h-full preserve-3d" style={{ rotateY }}>
-        <div className="h-full [backface-visibility:hidden] preserve-3d">
-          <Face service={service} index={index} />
-        </div>
-        <Back index={index} />
-      </motion.div>
-    </motion.li>
-  );
-}
-
-function Dealt({ columns }) {
-  const ref = useRef(null);
-  const reduce = useReducedMotion();
-  const { scrollYProgress } = useScroll({ target: ref, offset: ['start 92%', 'start 18%'] });
-  const eased = useSpring(scrollYProgress, { stiffness: 80, damping: 22, mass: 0.6 });
-  const done = useMotionValue(1);
-  return (
-    <ul
-      ref={ref}
-      className="m-0 mt-[clamp(32px,7vh,84px)] grid list-none gap-[clamp(10px,1.6vw,20px)] p-0"
-      style={{ gridTemplateColumns: `repeat(${columns}, minmax(0, 1fr))` }}
-    >
+    <div className="wrap mt-10 grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
       {services.map((service, index) => (
-        <DealtCard key={service.title} service={service} index={index} columns={columns} progress={reduce ? done : eased} />
+        <div key={service.title} className="h-[520px]">
+          <ServiceCard service={service} index={index} />
+        </div>
       ))}
-    </ul>
+    </div>
   );
 }
 
 export default function Services() {
-  const wide = useMediaQuery('(min-width: 1100px)');
+  const reduce = useReducedMotion();
   return (
-    <section id="services" className="relative py-[clamp(80px,13vh,160px)]">
+    <section id="services" className="relative pt-[clamp(90px,14vh,170px)]">
       <div className="wrap">
-        <SectionHead
-          index="03"
-          label="Services"
-          title="What I can do"
-          accent="for your team."
-          sub="I take a feature from the first screen to the database and out to production. Scroll to deal the cards."
-        />
-        <Dealt key={wide ? 3 : 2} columns={wide ? 3 : 2} />
+        <SectionHead index="03" label="Services" title="What I can do" accent="for your team." sub="Six things I do end to end. Each card runs a small live demo of the work itself." />
       </div>
+      {reduce ? <Grid /> : <Track />}
     </section>
   );
 }
