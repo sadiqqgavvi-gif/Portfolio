@@ -256,3 +256,30 @@
   from { stroke-dashoffset: 100; }
   to { stroke-dashoffset: -100; }
 }
+
+/* Project cards are one screen tall. On shorter windows the details step aside in order (tech chips, then
+   lines of the description, then the subtitle and stats) so the buttons at the bottom always stay visible. */
+.pc-lede {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+@media (max-width: 1023px) {
+  .pc-lede { -webkit-line-clamp: 4; }
+}
+@media (max-height: 880px) {
+  .pc-chips { display: none; }
+}
+@media (max-height: 760px) {
+  .pc-lede { -webkit-line-clamp: 3; }
+  .pc-title { font-size: clamp(2.1rem, 1.2rem + 2.8vw, 3.6rem); }
+}
+@media (max-height: 660px) {
+  .pc-lede { -webkit-line-clamp: 2; }
+}
+@media (max-height: 600px) {
+  .pc-kind { display: none; }
+}
+@media (max-height: 540px) {
+  .pc-stats { display: none; }
+}

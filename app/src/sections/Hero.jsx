@@ -18,14 +18,13 @@ const chips = [
   { name: 'React', icon: 'siReact', className: 'left-[2%] top-[16%]', delay: 0 },
   { name: 'Node.js', icon: 'siNodedotjs', className: 'right-[0%] top-[30%]', delay: 1.2 },
   { name: 'MongoDB', icon: 'siMongodb', className: 'left-[6%] bottom-[18%]', delay: 2.1 },
-  { name: 'Socket.io', icon: 'siSocketdotio', className: 'right-[8%] bottom-[10%]', delay: 0.6 },
-  { name: 'Express', icon: 'siExpress', className: 'right-[22%] top-[4%]', delay: 1.7, wide: true }
+  { name: 'Express', icon: 'siExpress', className: 'right-[6%] bottom-[12%]', delay: 1.7 }
 ];
 
 function Chip({ chip, ready, index }) {
   return (
     <motion.div
-      className={`absolute ${chip.className} ${chip.wide ? 'max-lg:hidden' : ''}`}
+      className={`absolute ${chip.className}`}
       initial={{ opacity: 0, scale: 0.6, y: 20 }}
       animate={ready ? { opacity: 1, scale: 1, y: 0 } : {}}
       transition={{ duration: 1, ease, delay: 1.1 + index * 0.12 }}
