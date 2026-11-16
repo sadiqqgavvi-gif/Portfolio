@@ -113,55 +113,62 @@ function ProjectCard({ project, index, enter, onOpen, pinned = false, className 
         backgroundImage: `radial-gradient(80% 110% at 100% 0%, color-mix(in srgb, ${project.accent} 22%, transparent), transparent 60%), radial-gradient(60% 80% at 0% 100%, color-mix(in srgb, ${project.accent} 8%, transparent), transparent 70%)`
       }}
     >
-      <div className="relative z-10 order-2 flex flex-col p-[clamp(16px,3vw,44px)] max-lg:pt-1 lg:order-1">
-        <div className="flex items-center justify-between gap-4">
-          <span className="inline-flex items-center gap-2 truncate rounded-full border px-3 py-1.5 text-[clamp(0.66rem,0.6rem+0.3vw,0.76rem)] font-medium" style={{ borderColor: `${project.accent}55`, color: project.accent, background: `${project.accent}12` }}>
-            <span className="size-1.5 rounded-full" style={{ background: project.accent, boxShadow: `0 0 10px ${project.accent}` }} aria-hidden="true" />
-            {project.tag}
+      {/* Left column: header and buttons keep their size; the details in between give way on short screens,
+          so the buttons are always inside the card. */}
+      <div className="relative z-10 order-2 flex min-h-0 flex-col p-[clamp(16px,2.8vw,40px)] max-lg:pt-1 lg:order-1">
+        <div className="flex shrink-0 items-center justify-between gap-4">
+          <span className="inline-flex min-w-0 items-center gap-2 rounded-full border px-3 py-1.5 text-[clamp(0.66rem,0.6rem+0.3vw,0.76rem)] font-medium" style={{ borderColor: `${project.accent}55`, color: project.accent, background: `${project.accent}12` }}>
+            <span className="size-1.5 shrink-0 rounded-full" style={{ background: project.accent, boxShadow: `0 0 10px ${project.accent}` }} aria-hidden="true" />
+            <span className="truncate">{project.tag}</span>
           </span>
           <span className="shrink-0 whitespace-nowrap font-mono text-[0.72rem] text-fog" aria-hidden="true">
             {pad(index + 1)} / {pad(projects.length)}
           </span>
         </div>
 
-        <h3 id={`project-${project.id}`} className="display text-gradient mt-[clamp(10px,2.4vh,28px)] text-[clamp(2.4rem,1.3rem+3.8vw,4.8rem)] leading-[0.95]">
-          {project.name}
-        </h3>
-        <p className="serif mt-1.5 text-[clamp(1.1rem,1rem+0.5vw,1.4rem)] text-bone/70">{project.kind}</p>
-        <p className="mt-[clamp(8px,1.8vh,20px)] max-w-[34em] text-[clamp(0.88rem,0.84rem+0.3vw,0.98rem)] leading-relaxed text-fog max-lg:line-clamp-4 max-lg:leading-snug max-lg:[@media(max-height:720px)]:line-clamp-2">{project.lede}</p>
+        <div className="pc-body relative min-h-0 flex-1 overflow-hidden">
+          <h3 id={`project-${project.id}`} className="pc-title display text-gradient mt-[clamp(10px,2.2vh,26px)] text-[clamp(2.4rem,1.3rem+3.6vw,4.6rem)] leading-[0.98]">
+            {project.name}
+          </h3>
+          <p className="pc-kind serif m-0 mt-1.5 text-[clamp(1.1rem,1rem+0.5vw,1.4rem)] text-bone/70">{project.kind}</p>
+          <p className="pc-lede m-0 mt-[clamp(8px,1.6vh,18px)] max-w-[34em] text-[clamp(0.88rem,0.84rem+0.3vw,0.98rem)] leading-relaxed text-fog max-lg:leading-snug">{project.lede}</p>
 
-        <dl className="m-0 mt-[clamp(10px,2.2vh,26px)] grid grid-cols-3 gap-3 border-y border-line py-[clamp(8px,1.4vh,14px)] max-lg:[@media(max-height:620px)]:hidden">
-          {project.highlights.map(item => (
-            <div key={item.label} className="min-w-0">
-              <dt className="sr-only">{item.label}</dt>
-              <dd className="m-0">
-                <b className="display block text-[clamp(1.35rem,1rem+1.1vw,2rem)] leading-none" style={{ color: project.accent }}>
-                  {item.value}
-                </b>
-                <span className="mt-1 block text-[0.74rem] leading-snug text-fog">{item.label}</span>
-              </dd>
-            </div>
-          ))}
-        </dl>
+          <dl className="pc-stats m-0 mt-[clamp(10px,2vh,24px)] grid grid-cols-3 gap-3 border-y border-line py-[clamp(8px,1.4vh,14px)]">
+            {project.highlights.map(item => (
+              <div key={item.label} className="min-w-0">
+                <dt className="sr-only">{item.label}</dt>
+                <dd className="m-0">
+                  <b className="display block text-[clamp(1.3rem,1rem+1vw,1.9rem)] leading-none" style={{ color: project.accent }}>
+                    {item.value}
+                  </b>
+                  <span className="mt-1 block text-[0.74rem] leading-snug text-fog">{item.label}</span>
+                </dd>
+              </div>
+            ))}
+          </dl>
 
-        <ul className="m-0 mt-[clamp(12px,2vh,22px)] flex list-none flex-wrap gap-1.5 p-0 max-lg:[@media(max-height:900px)]:hidden">
-          {shown.map(chip => (
-            <li key={chip} className="rounded-full border border-white/[0.08] bg-white/[0.03] px-2.5 py-1 text-[0.74rem] text-bone/80">
-              {chip}
-            </li>
-          ))}
-          {project.chips.length > shown.length && (
-            <li className="rounded-full px-1.5 py-1 text-[0.74rem] text-fog">+{project.chips.length - shown.length} more</li>
-          )}
-        </ul>
+          <ul className="pc-chips m-0 mt-[clamp(12px,2vh,20px)] flex list-none flex-wrap gap-1.5 p-0">
+            {shown.map(chip => (
+              <li key={chip} className="rounded-full border border-white/[0.08] bg-white/[0.03] px-2.5 py-1 text-[0.74rem] text-bone/80">
+                {chip}
+              </li>
+            ))}
+            {project.chips.length > shown.length && (
+              <li className="rounded-full px-1.5 py-1 text-[0.74rem] text-fog">+{project.chips.length - shown.length} more</li>
+            )}
+          </ul>
+        </div>
 
-        <div className="mt-auto flex flex-wrap items-center gap-2 pt-[clamp(12px,2.6vh,30px)] sm:gap-2.5">
+        <div className="flex shrink-0 flex-wrap items-center gap-2 pt-[clamp(12px,2.2vh,24px)] sm:gap-2.5">
           <Button variant="solid" onClick={onOpen} className={compact}>
             Case study
           </Button>
           {project.live && (
             <Button href={project.live} external className={compact} aria-label={`${project.name} live demo`}>
-              Live<span className="max-[430px]:hidden">&nbsp;demo</span> <ArrowUpRight size={15} strokeWidth={2.2} aria-hidden="true" />
+              <span>
+                Live<span className="max-[430px]:hidden"> demo</span>
+              </span>
+              <ArrowUpRight size={15} strokeWidth={2.2} aria-hidden="true" />
             </Button>
           )}
           <Button href={project.code} external className={compact} aria-label={`${project.name} source code on GitHub`}>
