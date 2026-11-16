@@ -150,7 +150,7 @@ export default function Contact() {
             viewport={{ once: true }}
             transition={{ duration: 0.9, ease, delay: 0.2 }}
           >
-            Hiring for a junior developer role, or have a project in mind? I usually reply within a day.
+            Hiring for a junior developer role, remote or with relocation, or have a project in mind? I usually reply within a day.
           </motion.p>
           <motion.div
             className="mt-8 flex flex-wrap items-center justify-center gap-3"
