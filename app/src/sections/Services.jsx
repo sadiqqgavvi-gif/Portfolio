@@ -1,5 +1,5 @@
 import { useLayoutEffect, useRef, useState } from 'react';
-import { motion, useMotionValueEvent, useReducedMotion, useScroll, useSpring, useTransform } from 'motion/react';
+import { motion, useMotionValueEvent, useReducedMotion, useScroll, useTransform } from 'motion/react';
 import { services } from '../data/site.js';
 import SectionHead from '../components/SectionHead.jsx';
 import SpotCard from '../components/SpotCard.jsx';
@@ -19,7 +19,7 @@ function ServiceCard({ service, index }) {
     >
       <div className="relative min-h-0 flex-1">
         <span className="pointer-events-none absolute -inset-4 rounded-[inherit] opacity-0 transition-opacity duration-500 group-hover:opacity-100" style={{ background: `radial-gradient(60% 60% at 50% 40%, ${accent}22, transparent)` }} aria-hidden="true" />
-        <div className="relative h-full" aria-hidden="true">
+        <div className="own-layer relative h-full" aria-hidden="true">
           <Demo />
         </div>
       </div>
@@ -52,9 +52,10 @@ function Track() {
   const [distance, setDistance] = useState(0);
   const [active, setActive] = useState(0);
   const { scrollYProgress } = useScroll({ target: pin, offset: ['start start', 'end end'] });
-  const smooth = useSpring(scrollYProgress, { stiffness: 120, damping: 30, mass: 0.4 });
-  const x = useTransform(smooth, value => -value * distance);
-  const bar = useTransform(smooth, value => value);
+  // Tied straight to the scroll position: the page's own smooth scrolling already eases it on desktop, and on
+  // phones the cards stay under the finger instead of trailing behind it.
+  const x = useTransform(scrollYProgress, value => -value * distance);
+  const bar = scrollYProgress;
   useMotionValueEvent(scrollYProgress, 'change', value => setActive(Math.min(services.length - 1, Math.round(value * (services.length - 1)))));
 
   useLayoutEffect(() => {

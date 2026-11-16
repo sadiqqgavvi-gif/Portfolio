@@ -40,7 +40,7 @@ export default function Nav({ ready }) {
         <div
           className={`mx-auto flex h-[52px] max-w-[1080px] items-center justify-between gap-3 rounded-full border pl-4 pr-1.5 transition-[background-color,border-color,box-shadow] duration-500 ${
             scrolled
-              ? 'border-white/[0.09] bg-[#0c0d10]/80 shadow-[0_10px_40px_-12px_rgb(0_0_0/0.9)] backdrop-blur-xl'
+              ? 'border-white/[0.09] bg-[#0c0d10]/92 shadow-[0_10px_40px_-12px_rgb(0_0_0/0.9)] lg:bg-[#0c0d10]/80 lg:backdrop-blur-xl'
               : 'border-transparent bg-transparent'
           }`}
         >

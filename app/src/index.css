@@ -203,6 +203,21 @@
   z-index: -1;
 }
 
+/* The glow follows a mouse pointer, so touch screens skip it. It is also the costliest paint on the page:
+   a masked gradient that is redrawn whenever anything inside the card moves. */
+@media (hover: none) {
+  .spot-card::before,
+  .spot-card::after {
+    display: none;
+  }
+}
+
+/* Anything that animates inside a card gets its own layer, so its frames never repaint the card around it. */
+.own-layer {
+  will-change: transform;
+  contain: layout paint;
+}
+
 /* A light that travels around a border (Magic UI "Border Beam" idea). */
 .border-beam {
   position: relative;
