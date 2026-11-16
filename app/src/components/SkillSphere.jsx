@@ -141,7 +141,7 @@ export default function SkillSphere({ items, activeGroup, className = '' }) {
               >
                 <Logo name={item.name} icon={item.icon} size={18} color={on ? undefined : '#8b8d97'} />
               </span>
-              <span className={`whitespace-nowrap text-[0.66rem] font-medium transition-opacity duration-500 ${on ? 'opacity-100' : 'opacity-0'}`}>{item.name}</span>
+              <span className={`whitespace-nowrap text-[0.66rem] font-medium transition-opacity duration-500 max-sm:hidden ${on ? 'opacity-100' : 'opacity-0'}`}>{item.name}</span>
             </div>
           );
         })}

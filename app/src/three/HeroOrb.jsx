@@ -122,7 +122,8 @@ function Orb({ still, compact }) {
       color: '#e9ebf0',
       metalness: 1,
       roughness: 0.09,
-      iridescence: 1,
+      // The iridescent film is the most expensive part of the shader; phones get plain polished chrome.
+      iridescence: compact ? 0 : 1,
       iridescenceIOR: 1.3,
       envMapIntensity: 1.35
     });
@@ -147,7 +148,7 @@ function Orb({ still, compact }) {
         .replace('#include <begin_vertex>', 'vec3 transformed = dispPos;');
     };
     return m;
-  }, [uniforms]);
+  }, [uniforms, compact]);
   useEffect(() => () => material.dispose(), [material]);
 
   const spin = useRef({ x: 0, y: 0, amp: 0.16 });
@@ -218,8 +219,26 @@ function Rings({ still }) {
 export default function HeroOrb({ compact = false }) {
   const holder = useRef(null);
   const [visible, setVisible] = useState(true);
-  const [dpr, setDpr] = useState(() => Math.min(window.devicePixelRatio || 1, 1.5));
+  const [dpr, setDpr] = useState(() => Math.min(window.devicePixelRatio || 1, compact ? 1.25 : 1.5));
   const still = prefersReducedMotion();
+
+  // On touch screens the orb holds still while a finger is scrolling and picks up again a moment after, so the
+  // scroll itself always gets the full frame budget. Nobody notices: the hero is moving off screen anyway.
+  const [scrolling, setScrolling] = useState(false);
+  useEffect(() => {
+    if (!window.matchMedia('(pointer: coarse)').matches) return undefined;
+    let timer = 0;
+    const onScroll = () => {
+      setScrolling(true);
+      clearTimeout(timer);
+      timer = setTimeout(() => setScrolling(false), 180);
+    };
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => {
+      clearTimeout(timer);
+      window.removeEventListener('scroll', onScroll);
+    };
+  }, []);
 
   // Draw only while the hero is on screen.
   useEffect(() => {
@@ -250,7 +269,7 @@ export default function HeroOrb({ compact = false }) {
     <div ref={holder} className="absolute inset-0" aria-hidden="true">
       <Canvas
         dpr={dpr}
-        frameloop={still ? 'demand' : visible ? 'always' : 'never'}
+        frameloop={still ? 'demand' : visible && !scrolling ? 'always' : 'never'}
         camera={{ position: [0, 0, 6.2], fov: 35 }}
         gl={{ antialias: true, alpha: true, powerPreference: 'high-performance', toneMapping: THREE.ACESFilmicToneMapping, toneMappingExposure: 1.05 }}
         resize={{ scroll: false, debounce: { scroll: 0, resize: 150 } }}

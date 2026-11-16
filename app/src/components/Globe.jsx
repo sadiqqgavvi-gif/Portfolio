@@ -28,6 +28,19 @@ export default function Globe({ className = '' }) {
     let velocity = 0;
     let visible = false;
     let frame = 0;
+    // On touch screens the globe holds still while a finger is scrolling, so the scroll gets every frame.
+    const coarse = window.matchMedia('(pointer: coarse)').matches;
+    let scrolling = false;
+    let settle = 0;
+    const onScroll = () => {
+      scrolling = true;
+      clearTimeout(settle);
+      settle = setTimeout(() => {
+        scrolling = false;
+        start();
+      }, 180);
+    };
+    if (coarse) window.addEventListener('scroll', onScroll, { passive: true });
 
     const globe = createGlobe(el, {
       devicePixelRatio: dpr,
@@ -53,7 +66,7 @@ export default function Globe({ className = '' }) {
 
     const render = () => {
       frame = 0;
-      if (!visible) return;
+      if (!visible || (scrolling && !drag)) return;
       if (!drag && !still) phi += 0.0035 + velocity;
       velocity *= 0.94;
       globe.update({ phi });
@@ -98,6 +111,8 @@ export default function Globe({ className = '' }) {
 
     return () => {
       cancelAnimationFrame(frame);
+      clearTimeout(settle);
+      window.removeEventListener('scroll', onScroll);
       observer.disconnect();
       resize.disconnect();
       el.removeEventListener('pointerdown', down);

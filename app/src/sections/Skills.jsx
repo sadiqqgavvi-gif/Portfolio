@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { AnimatePresence, motion, useInView } from 'motion/react';
+import { motion, useInView } from 'motion/react';
 import { skillGroups } from '../data/site.js';
 import { projects } from '../data/projects.js';
 import SectionHead from '../components/SectionHead.jsx';
@@ -39,7 +39,6 @@ export default function Skills() {
   const [touched, setTouched] = useState(false);
   const area = useRef(null);
   const inView = useInView(area, { margin: '-20% 0px -20% 0px' });
-  const group = skillGroups.find(g => g.title === active);
 
   // Until someone picks a group, the groups take turns lighting up.
   useEffect(() => {
@@ -62,7 +61,7 @@ export default function Skills() {
 
         <div ref={area} className="mt-[clamp(32px,6vh,64px)] grid items-center gap-[clamp(20px,4vw,56px)] lg:grid-cols-[minmax(0,1fr)_minmax(0,1.05fr)]">
           <div className="order-2 lg:order-1">
-            <div className="no-scrollbar -mx-[var(--gutter)] flex gap-2 overflow-x-auto px-[var(--gutter)] pb-1 lg:mx-0 lg:flex-wrap lg:px-0" role="tablist" aria-label="Skill groups">
+            <div className="flex flex-wrap gap-1.5 sm:gap-2" role="tablist" aria-label="Skill groups">
               {skillGroups.map(g => {
                 const on = g.title === active;
                 return (
@@ -72,7 +71,7 @@ export default function Skills() {
                     role="tab"
                     aria-selected={on}
                     onClick={() => pick(g.title)}
-                    className={`relative shrink-0 rounded-full border px-4 py-2 text-[0.85rem] transition-colors duration-300 ${on ? 'border-transparent text-ink' : 'border-white/10 text-fog hover:border-white/25 hover:text-bone'}`}
+                    className={`relative shrink-0 rounded-full border px-3 py-1.5 text-[0.78rem] transition-colors duration-300 sm:px-4 sm:py-2 sm:text-[0.85rem] ${on ? 'border-transparent text-ink' : 'border-white/10 text-fog hover:border-white/25 hover:text-bone'}`}
                   >
                     {on && <motion.span layoutId="skill-tab" className="absolute inset-0 rounded-full bg-bone" transition={{ type: 'spring', stiffness: 380, damping: 32 }} />}
                     <span className="relative">
@@ -83,45 +82,47 @@ export default function Skills() {
               })}
             </div>
 
-            <SpotCard className="mt-4 overflow-hidden rounded-[22px] p-[clamp(14px,2vw,22px)]">
-              <AnimatePresence mode="wait">
-                <motion.ul
-                  key={active}
-                  className="m-0 grid list-none gap-2 p-0 sm:grid-cols-2"
-                  initial={{ opacity: 0, y: 12 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -8 }}
-                  transition={{ duration: 0.35, ease }}
-                  role="tabpanel"
-                  aria-label={active}
-                >
-                  {group.items.map(([name, icon], i) => {
-                    const where = usedIn(name);
-                    return (
-                      <motion.li
-                        key={name}
-                        className="flex items-center gap-3 rounded-xl border border-white/[0.06] bg-white/[0.02] px-3 py-2.5"
-                        initial={{ opacity: 0, x: -10 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        transition={{ duration: 0.4, ease, delay: i * 0.04 }}
-                      >
-                        <span className="grid size-9 shrink-0 place-items-center rounded-lg border border-white/[0.08] bg-white/[0.03]">
-                          <Logo name={name} icon={icon} size={18} />
-                        </span>
-                        <span className="min-w-0">
-                          <b className="block text-[0.9rem] font-medium">{name}</b>
-                          <span className="block truncate text-[0.72rem] text-fog">{where.length ? (where.length === ALL.length ? 'All four projects' : where.join(' · ')) : 'Day-to-day tool'}</span>
-                        </span>
-                      </motion.li>
-                    );
-                  })}
-                </motion.ul>
-              </AnimatePresence>
+            <SpotCard className="mt-3 overflow-hidden rounded-[20px] p-2 sm:mt-4 sm:rounded-[22px] sm:p-[clamp(14px,2vw,22px)]">
+              {/* Every group's list sits in the same grid cell, so the card is always as tall as the longest
+                  group and nothing below it jumps when the group changes. */}
+              <div className="grid">
+                {skillGroups.map(g => {
+                  const on = g.title === active;
+                  return (
+                    <motion.ul
+                      key={g.title}
+                      className="m-0 grid list-none grid-cols-2 content-start gap-1.5 p-0 [grid-area:1/1] sm:gap-2"
+                      initial={false}
+                      animate={{ opacity: on ? 1 : 0, y: on ? 0 : 8 }}
+                      transition={{ duration: 0.35, ease }}
+                      style={{ visibility: on ? 'visible' : 'hidden', pointerEvents: on ? 'auto' : 'none' }}
+                      role="tabpanel"
+                      aria-label={g.title}
+                      aria-hidden={!on}
+                    >
+                      {g.items.map(([name, icon]) => {
+                        const where = usedIn(name);
+                        return (
+                          <li key={name} className="flex min-w-0 items-center gap-2 rounded-xl border border-white/[0.06] bg-white/[0.02] px-2 py-2 sm:gap-3 sm:px-3 sm:py-2.5">
+                            <span className="grid size-8 shrink-0 place-items-center rounded-lg border border-white/[0.08] bg-white/[0.03] sm:size-9">
+                              <Logo name={name} icon={icon} size={16} />
+                            </span>
+                            <span className="min-w-0">
+                              <b className="block truncate text-[0.8rem] font-medium sm:text-[0.9rem]">{name}</b>
+                              <span className="block truncate text-[0.64rem] text-fog sm:text-[0.72rem]">{where.length ? (where.length === ALL.length ? 'All projects' : where.join(' · ')) : 'Day-to-day tool'}</span>
+                            </span>
+                          </li>
+                        );
+                      })}
+                    </motion.ul>
+                  );
+                })}
+              </div>
             </SpotCard>
           </div>
 
           <motion.div
-            className="order-1 mx-auto w-full max-w-[min(560px,92vw)] lg:order-2"
+            className="order-1 mx-auto w-full max-w-[min(560px,84vw)] lg:order-2"
             initial={{ opacity: 0, scale: 0.85, rotate: -8 }}
             whileInView={{ opacity: 1, scale: 1, rotate: 0 }}
             viewport={{ once: true, margin: '0px 0px -10% 0px' }}
