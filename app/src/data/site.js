@@ -44,8 +44,8 @@ export const services = [
   {
     icon: 'realtime',
     title: 'Real-time',
-    text: 'Socket.io rooms, WebRTC calls and Server-Sent Events for instant delivery, presence, read receipts and live order tracking.',
-    tags: ['Socket.io', 'WebRTC', 'SSE']
+    text: 'Socket.io rooms, Server-Sent Events and WebRTC calls for instant delivery, presence, read receipts and live order tracking.',
+    tags: ['Socket.io', 'SSE', 'WebRTC']
   },
   {
     icon: 'ai',
@@ -97,10 +97,11 @@ export const process = [
 
 // Brand icons come from simple-icons by key; entries without one use a plain monogram.
 export const skillGroups = [
-  { title: 'Frontend', items: [['React', 'siReact'], ['JavaScript', 'siJavascript'], ['HTML5', 'siHtml5'], ['CSS', 'siCss'], ['Tailwind CSS', 'siTailwindcss'], ['Vite', 'siVite'], ['Three.js', 'siThreedotjs'], ['GSAP', 'siGreensock']] },
-  { title: 'Backend', items: [['Node.js', 'siNodedotjs'], ['Express', 'siExpress'], ['REST APIs', null], ['Socket.io', 'siSocketdotio'], ['WebRTC', 'siWebrtc']] },
-  { title: 'Data & auth', items: [['MongoDB', 'siMongodb'], ['Mongoose', 'siMongoose'], ['MySQL', 'siMysql'], ['JWT', 'siJsonwebtokens'], ['Google OAuth', 'siGoogle']] },
-  { title: 'DevOps', items: [['Git', 'siGit'], ['GitHub', 'siGithub'], ['GitHub Actions', 'siGithubactions'], ['Docker', 'siDocker'], ['Netlify', 'siNetlify'], ['Vercel', 'siVercel']] },
+  { title: 'Frontend', items: [['React', 'siReact'], ['JavaScript', 'siJavascript'], ['HTML5', 'siHtml5'], ['CSS', 'siCss'], ['Tailwind CSS', 'siTailwindcss'], ['Vite', 'siVite'], ['Three.js / R3F', 'siThreedotjs'], ['GSAP', 'siGreensock']] },
+  { title: 'Backend', items: [['Node.js', 'siNodedotjs'], ['Express', 'siExpress'], ['REST APIs', null], ['MVC structure', null]] },
+  { title: 'Real-time & APIs', items: [['Socket.io', 'siSocketdotio'], ['Server-Sent Events', null], ['WebRTC', 'siWebrtc'], ['OpenAI API', null], ['Web Speech API', null], ['Third-party APIs', null]] },
+  { title: 'Data & auth', items: [['MongoDB', 'siMongodb'], ['Mongoose', 'siMongoose'], ['MySQL', 'siMysql'], ['JWT', 'siJsonwebtokens'], ['Google OAuth', 'siGoogle'], ['bcrypt', null]] },
+  { title: 'Tools & DevOps', items: [['Git', 'siGit'], ['GitHub', 'siGithub'], ['GitHub Actions', 'siGithubactions'], ['Docker', 'siDocker'], ['Netlify', 'siNetlify'], ['Vercel', 'siVercel'], ['VS Code', null]] },
   { title: 'AI tools', items: [['ChatGPT', null], ['Claude', 'siClaude'], ['Gemini', 'siGooglegemini'], ['Codex', null], ['Antigravity', null]] }
 ];
 

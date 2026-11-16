@@ -95,7 +95,7 @@ export default function Hero({ ready }) {
             {...fade(0.15, 12)}
           >
             <span className="size-2 animate-pulse-dot rounded-full bg-emerald-400" aria-hidden="true" />
-            Available for work · remote & on-site
+            Available for work · remote or relocation
             <ArrowUpRight size={14} className="transition-transform duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5" aria-hidden="true" />
           </motion.a>
 
@@ -130,7 +130,7 @@ export default function Hero({ ready }) {
           </motion.p>
 
           <motion.p className="mt-5 max-w-[34rem] text-[clamp(1rem,0.96rem+0.25vw,1.12rem)] leading-relaxed text-fog" {...fade(0.72)}>
-            Software Engineering graduate who designs, builds and deploys complete MERN applications: secure APIs, real-time features and polished interfaces. I use AI tools to move fast without cutting corners.
+            Software Engineering graduate who turns ideas into working, deployed MERN applications. I pair a clear grasp of project architecture with AI coding tools to build fast, then debug, test and ship the result myself.
           </motion.p>
 
           <motion.div className="mt-8 flex flex-wrap items-center gap-3" {...fade(0.85)}>

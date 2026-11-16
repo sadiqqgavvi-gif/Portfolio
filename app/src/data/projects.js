@@ -37,7 +37,7 @@ export const projects = [
       { title: 'Voice interviews', text: 'The Web Speech API reads questions aloud, transcribes answers live and checks speaking pace in words per minute.' },
       { title: 'Five-criteria scoring', text: 'Relevance, depth, structure, clarity and examples, weighted per interview type, with STAR checks for behavioral answers.' },
       { title: 'Reference answers', text: '1,231 technical answers are compared with an answer key, so feedback names the concepts you missed and offers a model answer.' },
-      { title: 'Guardrails & fallback', text: 'Short, off-topic or gibberish answers are capped. OpenAI can write richer feedback, and the built-in engine takes over if that call fails.' },
+      { title: 'Three-tier AI pipeline', text: 'OpenAI first, an optional Python evaluator next, then a built-in Node.js engine, so feedback never goes down. Guardrails cap short, off-topic or gibberish answers.' },
       { title: 'Secure by default', text: 'bcrypt, Google sign-in, short-lived JWTs with rotating httpOnly refresh tokens, Helmet, a strict CORS allow-list and per-route rate limits.' }
     ],
     challenges: [
@@ -110,7 +110,7 @@ export const projects = [
     highlights: [
       { value: 'Live', label: 'order tracking over SSE' },
       { value: '3D', label: 'React Three Fiber scenes' },
-      { value: 'CI', label: 'tests on every push' }
+      { value: '13', label: 'automated tests in CI' }
     ],
     chips: ['React 19', 'Vite', 'Tailwind CSS 4', 'React Three Fiber', 'Three.js', 'GSAP ScrollTrigger', 'Lenis', 'Node.js', 'Express 5', 'MongoDB', 'Mongoose', 'JWT', 'Server-Sent Events', 'GitHub Actions', 'Vercel'],
     idea: 'A restaurant needs more than a menu page. Ember lets customers order and book online, gives staff a live dashboard, and pushes every status change from the kitchen to the customer’s tracking page without a refresh.',
@@ -143,7 +143,7 @@ export const projects = [
       ['Role', 'Solo build: design, frontend, backend'],
       ['Type', 'Full stack MERN web app'],
       ['Real-time', 'Server-Sent Events with a polling fallback'],
-      ['Tests', 'Unit and API integration tests in CI'],
+      ['Tests', '13 unit and API tests in GitHub Actions CI'],
       ['Status', 'Live on Vercel']
     ],
     flow: {

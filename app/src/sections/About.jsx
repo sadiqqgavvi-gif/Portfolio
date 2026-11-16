@@ -154,10 +154,10 @@ export default function About() {
               I turn ideas into <span className="serif text-accent-gradient">production-ready</span> web apps.
             </p>
             <p className="mt-5 text-[0.98rem] leading-relaxed text-fog">
-              I’m Gavriel, a Software Engineering graduate from Pakistan. I build on the MERN stack and care about the parts users never see: secure auth, clean APIs, tests and a CI pipeline that keeps it all honest. My final year project, SmartHire, is an AI interview coach that is live today.
+              I’m Gavriel, a Software Engineering graduate from Pakistan. I build on the MERN stack with a modular MVC structure and care about the parts users never see: secure auth, clean APIs, tests and a CI pipeline that keeps it all honest. I’m looking to take ownership of features in a product team and keep growing.
             </p>
             <ul className="m-0 mt-6 grid list-none gap-2.5 p-0 text-[0.92rem]">
-              {['Frontend, backend and full stack roles', 'Remote or on-site, full time', 'English and Urdu'].map(item => (
+              {['Frontend, backend and full stack roles', 'Remote, or ready to relocate', 'English and Urdu'].map(item => (
                 <li key={item} className="flex items-center gap-3">
                   <span className="size-1.5 rounded-full bg-sodium" aria-hidden="true" />
                   {item}
